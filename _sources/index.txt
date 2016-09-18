@@ -9,7 +9,9 @@ Welcome to Haskell Distributed's documentation!
 Contents:
 
 .. toctree::
+   :glob:
    :maxdepth: 2
+   :numbered:
 
    getting-started
    2ch
