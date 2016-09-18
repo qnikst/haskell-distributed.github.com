@@ -1,0 +1,595 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>3. Getting to know Processes &mdash; Cloud Haskell User Guide</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Cloud Haskell User Guide" href="../index.html"/>
+        <link rel="next" title="4. Getting to messaging" href="getting-to-messages.html"/>
+        <link rel="prev" title="2. Getting Started" href="getting-started.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Cloud Haskell
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">1. Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">2. Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#setting-up-the-project">2.1. Setting up the project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#creating-a-node">2.2. Creating a node</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#sending-messages">2.3. Sending messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#serializable-data">2.4. Serializable Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#spawning-remote-processes">2.5. Spawning Remote Processes</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">3. Getting to know Processes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#concurrency-and-distribution">3.1. Concurrency and Distribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#process-lifetime">3.2. Process Lifetime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#monitoring-and-linking">3.3. Monitoring and Linking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#getting-process-info">3.4. Getting Process Info</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#monad-transformer-stacks">3.5. Monad Transformer Stacks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="getting-to-messages.html">4. Getting to messaging</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting-to-messages.html#what-is-serializable">4.1. What is Serializable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-to-messages.html#message-ordering">4.2. Message Ordering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-to-messages.html#selective-receive">4.3. Selective Receive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-to-messages.html#advanced-mailbox-processing">4.4. Advanced Mailbox Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-to-messages.html#typed-channels">4.5. Typed Channels</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/network-transport.html">5. Network Transport Abstraction Layer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../managing-topologies.html">6. Managing Topologies</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../managing-topologies.html#overview">6.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managing-topologies.html#a-simple-example">6.2. A Simple Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managing-topologies.html#master-slave-configurations">6.3. Master Slave Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managing-topologies.html#other-topologies-and-backends">6.4. Other Topologies and Backends</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../managed-process.html">7. Distributed-process platform</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../managed-process.html#managed-process-tutorial">7.1. Managed Process Tutorial</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../managed-process.html#introduction">7.1.1. Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../managed-process.html#managed-processes">7.1.2. Managed Processes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../managed-process.html#a-basic-example">7.1.3. A Basic Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../managed-process.html#building-a-task-queue">7.1.4. Building a Task Queue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../managed-process.html#implementing-the-client">7.1.5. Implementing the client</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../managed-process.html#implementing-the-server">7.1.6. Implementing the server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../managed-process.html#making-use-of-async">7.1.7. Making use of Async</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../5ch.html">8. ![Sup1: ][sup1]</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../5ch.html#sup2-sup2">9. ![Sup2: ][sup2]</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../5ch.html#sup3-sup3">10. ![Sup3: ][sup3]</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../6ch.html">11. Advanced Managed Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial-NT2.html">12. Programming with Network.Transport</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">Cloud Haskell</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+    <li>3. Getting to know Processes</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/tutorial/getting-to-know-processes.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="getting-to-know-processes">
+<h1>3. Getting to know Processes<a class="headerlink" href="#getting-to-know-processes" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="concurrency-and-distribution">
+<h2>3.1. Concurrency and Distribution<a class="headerlink" href="#concurrency-and-distribution" title="Permalink to this headline">¶</a></h2>
+<p>The <em>Process Layer</em> is where Cloud Haskell&#8217;s support for concurrency and
+distributed programming are exposed to application developers. This layer
+deals explicitly with</p>
+<p>The core of Cloud Haskell&#8217;s concurrency and distribution support resides in the
+[distributed-process][distributed-process] library. As well as the APIs necessary for starting
+nodes and forking processes on them, we find all the basic primitives required
+to</p>
+<ul class="simple">
+<li>spawn processes locally and remotely</li>
+<li>send and receive messages, optionally using typed channels</li>
+<li>monitor and/or link to processes, channels and other nodes</li>
+</ul>
+<p>Most of this is easy enough to follow in the haddock documentation and the
+various tutorials. Here we focus on the essential <em>concepts</em> behind the
+process layer.</p>
+<p>A concurrent process is somewhat like a Haskell thread - in fact it is a
+<code class="docutils literal"><span class="pre">forkIO</span></code> thread - but with few differences.</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Process run <code class="docutils literal"><span class="pre">Process</span></code> code instead of <code class="docutils literal"><span class="pre">IO</span></code>. This allow process to use
+communication function specific to the distributed-process.</li>
+<li>In addition to <code class="docutils literal"><span class="pre">ThreadId</span></code> each process have it&#8217;s own <cite>ProcessId</cite>
+that can be used as a label then sending messages both locally and remotely.</li>
+<li><code class="docutils literal"><span class="pre">Process</span></code> lifetime is bound to the lifetime of the <cite>Node</cite> it&#8217;s running
+on. When node will be closed, all processes that are running on that node
+are also closed.</li>
+<li><em>Node Controller</em> bookkeep information about thread lifetime, and notify
+interested processes in <code class="docutils literal"><span class="pre">Process</span></code> exit and <em>the exit reason</em>.</li>
+<li>Each <code class="docutils literal"><span class="pre">Process</span></code> have mailbox associated with that <code class="docutils literal"><span class="pre">Process</span></code> that can be
+used to read incomming messages.</li>
+</ol>
+</div></blockquote>
+<p>Process that can send and receive messages through its
+<em>process mailbox</em>. Each process can send messages asynchronously to other
+processes, and can receive messages synchronously from its own mailbox.
+The conceptual difference between threads and processes is that the latter
+do not share state, but communicate only via message passing.</p>
+<p>Code that is executed in this manner must run in the <cite>Process</cite> monad. Our
+process will look like any other monad code, plus we provide and instance
+of <cite>MonadIO</cite> for <cite>Process</cite>, so you can <cite>liftIO</cite> to make IO actions
+available.</p>
+<p>Processes reside on nodes, which in our implementation map directly to the
+<cite>Control.Distributed.Processes.Node</cite> module. Given a configured
+<cite>Network.Transport</cite> backend, starting a new node is fairly simple:</p>
+<div class="highlight-haskell"><div class="highlight"><pre><span class="nf">newLocalNode</span> <span class="ow">::</span> <span class="kt">Transport</span> <span class="ow">-&gt;</span> <span class="kt">IO</span> <span class="kt">LocalNode</span>
+</pre></div>
+</div>
+<p>Once this function returns, the node will be <em>up and running</em> and able to
+interact with other nodes and host processes. It is possible to start more
+than one node in the same running program, though if you do this they will
+continue to send messages to one another using the supplied <code class="docutils literal"><span class="pre">Network.Transport</span></code>
+backend.</p>
+<p>Given a new node, there are two primitives for starting a new process.</p>
+<div class="highlight-haskell"><div class="highlight"><pre><span class="nf">forkProcess</span> <span class="ow">::</span> <span class="kt">LocalNode</span> <span class="ow">-&gt;</span> <span class="kt">Process</span> <span class="nb">()</span> <span class="ow">-&gt;</span> <span class="kt">IO</span> <span class="kt">ProcessId</span>
+<span class="nf">runProcess</span>  <span class="ow">::</span> <span class="kt">LocalNode</span> <span class="ow">-&gt;</span> <span class="kt">Process</span> <span class="nb">()</span> <span class="ow">-&gt;</span> <span class="kt">IO</span> <span class="nb">()</span>
+</pre></div>
+</div>
+<p>Once we&#8217;ve spawned some processes, they can communicate with one another
+using the messaging primitives provided by [distributed-processes][distributed-processes],
+which are well documented in the haddocks.</p>
+</div>
+<div class="section" id="process-lifetime">
+<h2>3.2. Process Lifetime<a class="headerlink" href="#process-lifetime" title="Permalink to this headline">¶</a></h2>
+<p>A process will continue executing until it has evaluated to some value, or is abruptly
+terminated either by crashing (with an un-handled exception) or being instructed to
+stop executing. Deliberate stop instructions take one of two forms: a <code class="docutils literal"><span class="pre">ProcessExitException</span></code>
+or <code class="docutils literal"><span class="pre">ProcessKillException</span></code>. As the names suggest, these <em>signals</em> are delivered in the form
+of asynchronous exceptions, however you should not to rely on that fact! After all,
+we cannot throw an exception to a thread that is executing in some other operating
+system process or on a remote host! Instead, you should use the <a class="reference external" href="https://hackage.haskell.org/package/distributed-process-0.6.1/docs/Control-Distributed-Process.html?v:exit">exit</a> and <a class="reference external" href="https://hackage.haskell.org/package/distributed-process-0.6.1/docs/Control-Distributed-Process.html?v:kill">kill</a>
+primitives from <a class="reference external" href="http://hackage.haskell.org/package/distributed-process">distributed-process</a>, which not only ensure that remote target processes
+are handled seamlessly, but also maintain a guarantee that if you send a message and
+<em>then</em> an exit signal, the message will be delivered to the destination process (via its
+local node controller) before the exception is thrown - note that this does not guarantee
+that the destination process will have time to <em>do anything</em> with the message before it
+is terminated.</p>
+<p>The <code class="docutils literal"><span class="pre">ProcessExitException</span></code> signal is sent from one process to another, indicating that the
+receiver is being asked to terminate. A process can choose to tell itself to exit, and the
+<a class="reference external" href="https://hackage.haskell.org/package/distributed-process-0.6.1/docs/Control-Distributed-Process.html?v:die">die</a> primitive simplifies doing so without worrying about the expected type for the
+action. In fact, <code class="docutils literal"><span class="pre">die</span></code> has slightly different semantics from <code class="docutils literal"><span class="pre">exit</span></code>, since the latter involves
+sending an internal signal to the local node controller. A direct consequence
+of this is that the <em>exit signal</em> may not arrive immediately, since the <em>Node Controller</em> could
+be busy processing other events. On the other hand, the <code class="docutils literal"><span class="pre">die</span></code> primitive throws a
+<a class="reference external" href="https://hackage.haskell.org/package/distributed-process-0.6.1/docs/Control-Distributed-Process.html?v:ProcessExitException">ProcessExitException</a> directly in the calling thread, thus terminating it without delay.
+In practise, this means the following two functions could behave quite differently at
+runtime:</p>
+<div class="highlight-haskell"><div class="highlight"><pre><span class="c1">-- this will never print anything...</span>
+<span class="nf">demo1</span> <span class="ow">=</span> <span class="n">die</span> <span class="s">&quot;Boom&quot;</span> <span class="o">&gt;&gt;</span> <span class="n">expect</span> <span class="o">&gt;&gt;=</span> <span class="n">say</span>
+
+<span class="c1">-- this /might/ print something before it exits</span>
+<span class="nf">demo2</span> <span class="ow">=</span> <span class="kr">do</span>
+  <span class="n">self</span> <span class="ow">&lt;-</span> <span class="n">getSelfPid</span>
+  <span class="n">exit</span> <span class="n">self</span> <span class="s">&quot;Boom&quot;</span>
+  <span class="n">expect</span> <span class="o">&gt;&gt;=</span> <span class="n">say</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">ProcessExitException</span></code> type holds a <em>reason</em> field, which is serialised as a raw <code class="docutils literal"><span class="pre">Message</span></code>.
+This exception type is exported, so it is possible to catch these <em>exit signals</em> and decide how
+to respond to them. Catching <em>exit signals</em> is done via a set of primitives in
+distributed-process, and the use of them forms a key component of the various fault tolerance
+strategies provided by distributed-process-platform.</p>
+<p>A <code class="docutils literal"><span class="pre">ProcessKillException</span></code> is intended to be an <strong>untrappable</strong> exit signal, so its type is
+not exported and therefore you can <strong>only</strong> handle it by catching all exceptions, which
+as we all know is very bad practise. The <cite>kill</cite> primitive is intended to be a
+<strong>brutal</strong> means for terminating process - e.g., it is used to terminate supervised child
+processes that haven&#8217;t shutdown on request, or to terminate processes that don&#8217;t require
+any special cleanup code to run when exiting - although it does behave like <cite>exit</cite>
+in so much as it is dispatched (to the target process) via the <em>Node Controller</em>.</p>
+<p>Exit signals in Cloud Haskell then, are unlike asynchronous exceptions in other
+haskell code. Whilst a process <em>can</em> use asynchronous exceptions - there&#8217;s
+nothing stoping this since the <code class="docutils literal"><span class="pre">Process</span></code> monad is an instance of <code class="docutils literal"><span class="pre">MonadIO</span></code> -
+as we&#8217;ve seen, exceptions thrown are not bound by the same ordering guarantees
+as messages delivered to a process. Link failures and exit signals <strong>might</strong> work
+via asynchronous exceptions - that is the case in the current implementation - but
+these are implemented in such a fashion that if you send a message and <strong>then</strong> an
+exit signal, the message is guaranteed to arrive first.</p>
+<p>Because processes are implemented with <code class="docutils literal"><span class="pre">forkIO</span></code> we might be tempted to stop
+them by throwing an asynchronous exception to the process, but this is almost
+certainly the wrong thing to do. Firstly, processes might reside on a remote
+node, in which case throwing an exception is impossible. Secondly, if we send
+some messages to a process&#8217; mailbox and then dispatch an exception to kill it,
+there is no guarantee that the subject will receive our message before being
+terminated by the asynchronous exception.</p>
+</div>
+<div class="section" id="monitoring-and-linking">
+<h2>3.3. Monitoring and Linking<a class="headerlink" href="#monitoring-and-linking" title="Permalink to this headline">¶</a></h2>
+<p>Processes can be linked to other processes (or nodes or channels). A link, which is
+unidirectional, guarantees that once any object we have linked to <em>exits</em>, we will also
+be terminated. A simple way to test this is to spawn a child process, link to it and then
+terminate it, noting that we will subsequently die ourselves. Here&#8217;s a simple example,
+in which we link to a child process and then cause it to terminate (by sending it a message
+of the type it is waiting for). Even though the child terminates &#8220;normally&#8221;, our process
+is also terminated since <a class="reference external" href="https://hackage.haskell.org/package/distributed-process-0.6.1/docs/Control-Distributed-Process.html?v:link">link</a>
+will <em>link the lifetime of two processes together</em> regardless
+of exit reasons.</p>
+<div class="highlight-haskell"><div class="highlight"><pre><span class="nf">demo</span> <span class="ow">=</span> <span class="kr">do</span>
+  <span class="n">pid</span> <span class="ow">&lt;-</span> <span class="n">spawnLocal</span> <span class="o">$</span> <span class="n">receive</span> <span class="o">&gt;&gt;=</span> <span class="n">return</span>
+  <span class="n">link</span> <span class="n">pid</span>
+  <span class="n">send</span> <span class="n">pid</span> <span class="nb">()</span>
+  <span class="nb">()</span> <span class="ow">&lt;-</span> <span class="n">receive</span>
+</pre></div>
+</div>
+<p>The medium that link failures uses to signal exit conditions is the same as exit and kill
+signals - asynchronous exceptions. Once again, it is a bad idea to rely on this (not least
+because it might change in some future release) and the exception type (<code class="docutils literal"><span class="pre">ProcessLinkException</span></code>)
+is not exported so as to prevent developers from abusing exception handling code in this
+special case. Since link exit signals cannot be caught directly, if you find yourself wanting
+to <strong>trap</strong> a link failure, you probably want to use a monitor instead.</p>
+<p>Whilst the built-in <cite>link</cite> primitive terminates the link-ee regardless of exit reason,
+<a class="reference external" href="http://hackage.haskell.org/package/distributed-process-platform">distributed-process-platform</a> provides an alternate function <code class="docutils literal"><span class="pre">linkOnFailure</span></code>,
+which only dispatches the <code class="docutils literal"><span class="pre">ProcessLinkException</span></code> if the link-ed process dies abnormally
+(i.e., with some <cite>DiedReason</cite> other than <cite>DiedNormal</cite>).</p>
+<p>TODO: describe monitors better and move <cite>linkOnFailure</cite> to the cookbook.</p>
+<p>Monitors on the other hand, do not cause the <strong>listening</strong> process to exit at all, instead
+putting a <code class="docutils literal"><span class="pre">ProcessMonitorNotification</span></code> into the process&#8217; mailbox. This signal and its
+constituent fields can be introspected in order to decide what action (if any) the receiver
+can/should take in response to the monitored process&#8217; death. Let&#8217;s take a look at how
+monitors can be used to determine both when and <em>how</em> a process has terminated. Tucked
+away in <cite>distributed-process-platform</cite>, the <code class="docutils literal"><span class="pre">linkOnFailure</span></code> primitive works in exactly this
+way, only terminating the caller if the subject terminates abnormally. Let&#8217;s take a look...</p>
+<div class="highlight-haskell"><div class="highlight"><pre><span class="nf">linkOnFailure</span> <span class="n">them</span> <span class="ow">=</span> <span class="kr">do</span>
+  <span class="n">us</span> <span class="ow">&lt;-</span> <span class="n">getSelfPid</span>
+  <span class="n">tid</span> <span class="ow">&lt;-</span> <span class="n">liftIO</span> <span class="o">$</span> <span class="n">myThreadId</span>
+  <span class="n">void</span> <span class="o">$</span> <span class="n">spawnLocal</span> <span class="o">$</span> <span class="kr">do</span>
+    <span class="n">callerRef</span> <span class="ow">&lt;-</span> <span class="kt">P</span><span class="o">.</span><span class="n">monitor</span> <span class="n">us</span>
+    <span class="n">calleeRef</span> <span class="ow">&lt;-</span> <span class="kt">P</span><span class="o">.</span><span class="n">monitor</span> <span class="n">them</span>
+    <span class="n">reason</span> <span class="ow">&lt;-</span> <span class="n">receiveWait</span> <span class="p">[</span>
+             <span class="n">matchIf</span> <span class="p">(</span><span class="nf">\</span><span class="p">(</span><span class="kt">ProcessMonitorNotification</span> <span class="n">mRef</span> <span class="kr">_</span> <span class="kr">_</span><span class="p">)</span> <span class="ow">-&gt;</span>
+                       <span class="n">mRef</span> <span class="o">==</span> <span class="n">callerRef</span><span class="p">)</span> <span class="c1">-- nothing left to do</span>
+                     <span class="p">(</span><span class="nf">\</span><span class="kr">_</span> <span class="ow">-&gt;</span> <span class="n">return</span> <span class="kt">DiedNormal</span><span class="p">)</span>
+           <span class="p">,</span> <span class="n">matchIf</span> <span class="p">(</span><span class="nf">\</span><span class="p">(</span><span class="kt">ProcessMonitorNotification</span> <span class="n">mRef&#39;</span> <span class="kr">_</span> <span class="kr">_</span><span class="p">)</span> <span class="ow">-&gt;</span>
+                       <span class="n">mRef&#39;</span> <span class="o">==</span> <span class="n">calleeRef</span><span class="p">)</span>
+                     <span class="p">(</span><span class="nf">\</span><span class="p">(</span><span class="kt">ProcessMonitorNotification</span> <span class="kr">_</span> <span class="kr">_</span> <span class="n">r&#39;</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="n">return</span> <span class="n">r&#39;</span><span class="p">)</span>
+         <span class="p">]</span>
+    <span class="kr">case</span> <span class="n">reason</span> <span class="kr">of</span>
+      <span class="kt">DiedNormal</span> <span class="ow">-&gt;</span> <span class="n">return</span> <span class="nb">()</span>
+      <span class="kr">_</span> <span class="ow">-&gt;</span> <span class="n">liftIO</span> <span class="o">$</span> <span class="n">throwTo</span> <span class="n">tid</span> <span class="p">(</span><span class="kt">ProcessLinkException</span> <span class="n">us</span> <span class="n">reason</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>As we can see, this code makes use of monitors to track both processes involved in the
+link. In order to track <em>both</em> processes and react to changes in their status, it is
+necessary to spawn a third process which will do the monitoring. This doesn&#8217;t happen
+with the built-in link primitive, but is necessary in this case since the link handling
+code resides outside the <em>Node Controller</em>.</p>
+<p>The two matches passed to <code class="docutils literal"><span class="pre">receiveWait</span></code> both handle a <code class="docutils literal"><span class="pre">ProcessMonitorNotification</span></code>, and
+the predicate passed to <code class="docutils literal"><span class="pre">matchIf</span></code> is used to determine whether the notification we&#8217;re
+receiving is for the process that called us, or the <em>linked to</em> process. If the former
+dies, we&#8217;ve nothing more to do, since links are unidirectional. If the latter dies
+however, we must examine the <code class="docutils literal"><span class="pre">DiedReason</span></code> the <code class="docutils literal"><span class="pre">ProcessMonitorNotification</span></code> provides us
+with, to determine whether the subject exited normally (i.e., with <code class="docutils literal"><span class="pre">DiedNormal</span></code>).
+If the exit was _abnormal_, we throw a <code class="docutils literal"><span class="pre">ProcessLinkException</span></code> to the original caller,
+which is exactly how an ordinary link would behave.</p>
+<p>Linking and monitoring are foundational tools for <strong>supervising</strong> processes, where a top level
+process manages a set of children, starting, stopping and restarting them as necessary.</p>
+</div>
+<div class="section" id="getting-process-info">
+<h2>3.4. Getting Process Info<a class="headerlink" href="#getting-process-info" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference external" href="https://hackage.haskell.org/package/distributed-process-0.6.1/docs/Control-Distributed-Process.html?v:getProcessInfo">getProcessInfo</a> function provides a means for us to obtain information about a running
+process. The <cite>:api-dp:`ProcessInfo</cite> type it returns contains the local node id and a list of
+registered names, monitors and links for the process. The call returns <code class="docutils literal"><span class="pre">Nothing</span></code> if the
+process in question is not alive.</p>
+<p>In order to get <code class="docutils literal"><span class="pre">ProcessId</span></code> and <code class="docutils literal"><span class="pre">NodeId</span></code> of the currently running process one
+could <a class="reference external" href="https://hackage.haskell.org/package/distributed-process-0.6.1/docs/Control-Distributed-Process.html?v:getProcessId">getProcessId</a> and <a class="reference external" href="https://hackage.haskell.org/package/distributed-process-0.6.1/docs/Control-Distributed-Process.html?v:getNodeId">getNodeId</a> respectively.</p>
+</div>
+<div class="section" id="monad-transformer-stacks">
+<h2>3.5. Monad Transformer Stacks<a class="headerlink" href="#monad-transformer-stacks" title="Permalink to this headline">¶</a></h2>
+<p>It is not generally necessary, but it may be convenient in your application to use a
+custom monad transformer stack with the Process monad at the bottom. For example,
+you may have decided that in various places in your application you will make calls to
+a network database. You may create a data access module, and it will need configuration information available to it in
+order to connect to the database server. A ReaderT can be a nice way to make
+configuration data available throughout an application without
+schlepping it around by hand.</p>
+<p>This example is a bit contrived and over-simplified but
+illustrates the concept. Consider the <cite>fetchUser</cite> function below, it runs in the <cite>AppProcess</cite>
+monad which provides the configuration settings required to connect to the database:</p>
+<div class="highlight-haskell"><div class="highlight"><pre><span class="kr">import</span> <span class="nn">Data.ByteString</span> <span class="p">(</span><span class="kt">ByteString</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Control.Monad.Reader</span>
+
+<span class="c1">-- imagine we have some database library</span>
+<span class="kr">import</span> <span class="nn">Database.Imaginary</span> <span class="k">as</span> <span class="n">DB</span>
+
+<span class="kr">data</span> <span class="kt">AppConfig</span> <span class="ow">=</span> <span class="kt">AppConfig</span> <span class="p">{</span><span class="n">dbHost</span> <span class="ow">::</span> <span class="kt">String</span><span class="p">,</span> <span class="n">dbUser</span> <span class="ow">::</span> <span class="kt">String</span><span class="p">}</span>
+
+<span class="kr">type</span> <span class="kt">AppProcess</span> <span class="ow">=</span> <span class="kt">ReaderT</span> <span class="kt">AppConfig</span> <span class="kt">Process</span>
+
+<span class="kr">data</span> <span class="kt">User</span> <span class="ow">=</span> <span class="kt">User</span> <span class="p">{</span><span class="n">userEmail</span> <span class="ow">::</span> <span class="kt">String</span><span class="p">}</span>
+
+<span class="c1">-- Perform a user lookup using our custom app context</span>
+<span class="nf">fetchUser</span> <span class="ow">::</span> <span class="kt">String</span> <span class="ow">-&gt;</span> <span class="kt">AppProcess</span> <span class="p">(</span><span class="kt">Maybe</span> <span class="kt">User</span><span class="p">)</span>
+<span class="nf">fetchUser</span> <span class="n">email</span> <span class="ow">=</span> <span class="kr">do</span>
+  <span class="n">db</span> <span class="ow">&lt;-</span> <span class="n">openDB</span>
+  <span class="n">user</span> <span class="ow">&lt;-</span> <span class="n">liftIO</span> <span class="o">$</span> <span class="kt">DB</span><span class="o">.</span><span class="n">query</span> <span class="n">db</span> <span class="n">email</span>
+  <span class="n">closeDB</span> <span class="n">db</span>
+  <span class="n">return</span> <span class="n">user</span>
+
+<span class="nf">openDB</span> <span class="ow">::</span> <span class="kt">AppProcess</span> <span class="kt">DB</span><span class="o">.</span><span class="kt">Connection</span>
+<span class="nf">openDB</span> <span class="ow">=</span> <span class="kr">do</span>
+  <span class="kt">AppConfig</span> <span class="n">host</span> <span class="n">user</span> <span class="ow">&lt;-</span> <span class="n">ask</span>
+  <span class="n">liftIO</span> <span class="o">$</span> <span class="kt">DB</span><span class="o">.</span><span class="n">connect</span> <span class="n">host</span> <span class="n">user</span>
+
+<span class="nf">closeDB</span> <span class="ow">::</span> <span class="kt">DB</span><span class="o">.</span><span class="kt">Connection</span> <span class="ow">-&gt;</span> <span class="kt">AppProcess</span> <span class="nb">()</span>
+<span class="nf">closeDB</span> <span class="n">db</span> <span class="ow">=</span> <span class="n">liftIO</span> <span class="p">(</span><span class="kt">DB</span><span class="o">.</span><span class="n">close</span> <span class="n">db</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>So this would mostly work but it is not complete. What happens if an exception
+is thrown by the <cite>query</cite> function? Your open database handle may not be
+closed. Typically we manage this with the [bracket][brkt] function.</p>
+<p>In the base library, [bracket][brkt] is defined in Control.Exception with this signature:</p>
+<div class="highlight-haskell"><div class="highlight"><pre><span class="nf">bracket</span> <span class="ow">::</span> <span class="kt">IO</span> <span class="n">a</span>        <span class="o">--^</span> <span class="n">computation</span> <span class="n">to</span> <span class="n">run</span> <span class="n">first</span> <span class="p">(</span><span class="s">&quot;acquire resource&quot;</span><span class="p">)</span>
+        <span class="ow">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="ow">-&gt;</span> <span class="kt">IO</span> <span class="n">b</span><span class="p">)</span> <span class="o">--^</span> <span class="n">computation</span> <span class="n">to</span> <span class="n">run</span> <span class="n">last</span> <span class="p">(</span><span class="s">&quot;release resource&quot;</span><span class="p">)</span>
+        <span class="ow">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="ow">-&gt;</span> <span class="kt">IO</span> <span class="n">c</span><span class="p">)</span> <span class="o">--^</span> <span class="n">computation</span> <span class="n">to</span> <span class="n">run</span> <span class="kr">in</span><span class="o">-</span><span class="n">between</span>
+        <span class="ow">-&gt;</span> <span class="kt">IO</span> <span class="n">c</span>
+</pre></div>
+</div>
+<p>Great! We pass an IO action that acquires a resource; <cite>bracket</cite> passes that
+resource to a function which takes the resource and runs another action.
+We also provide a release function which <cite>bracket</cite> is guaranteed to run
+even if the primary action raises an exception.</p>
+<p>Unfortunately, we cannot directly use <cite>bracket</cite> in our
+<cite>fetchUser</cite> function: openDB (resource acquisition) runs in the <cite>AppProcess</cite>
+monad. If our functions ran in IO, we could lift the entire bracket computation into
+our monad transformer stack with liftIO; but we cannot do that for the computations
+<em>passed</em> to bracket.</p>
+<p>It is perfectly possible to write our own bracket; <cite>distributed-process</cite> does this
+for the <cite>Process</cite> monad (which is itself a newtyped ReaderT stack). Here is how that is done:</p>
+<div class="highlight-haskell"><div class="highlight"><pre><span class="c1">-- | Lift &#39;Control.Exception.bracket&#39;</span>
+<span class="nf">bracket</span> <span class="ow">::</span> <span class="kt">Process</span> <span class="n">a</span> <span class="ow">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="ow">-&gt;</span> <span class="kt">Process</span> <span class="n">b</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="ow">-&gt;</span> <span class="kt">Process</span> <span class="n">c</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="kt">Process</span> <span class="n">c</span>
+<span class="nf">bracket</span> <span class="n">before</span> <span class="n">after</span> <span class="n">thing</span> <span class="ow">=</span>
+  <span class="n">mask</span> <span class="o">$</span> <span class="nf">\</span><span class="n">restore</span> <span class="ow">-&gt;</span> <span class="kr">do</span>
+    <span class="n">a</span> <span class="ow">&lt;-</span> <span class="n">before</span>
+    <span class="n">r</span> <span class="ow">&lt;-</span> <span class="n">restore</span> <span class="p">(</span><span class="n">thing</span> <span class="n">a</span><span class="p">)</span> <span class="p">`</span><span class="n">onException</span><span class="p">`</span> <span class="n">after</span> <span class="n">a</span>
+    <span class="kr">_</span> <span class="ow">&lt;-</span> <span class="n">after</span> <span class="n">a</span>
+    <span class="n">return</span> <span class="n">r</span>
+
+<span class="nf">mask</span> <span class="ow">::</span> <span class="p">((</span><span class="n">forall</span> <span class="n">a</span><span class="o">.</span> <span class="kt">Process</span> <span class="n">a</span> <span class="ow">-&gt;</span> <span class="kt">Process</span> <span class="n">a</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="kt">Process</span> <span class="n">b</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="kt">Process</span> <span class="n">b</span>
+<span class="nf">mask</span> <span class="n">p</span> <span class="ow">=</span> <span class="kr">do</span>
+    <span class="n">lproc</span> <span class="ow">&lt;-</span> <span class="n">ask</span>
+    <span class="n">liftIO</span> <span class="o">$</span> <span class="kt">Ex</span><span class="o">.</span><span class="n">mask</span> <span class="o">$</span> <span class="nf">\</span><span class="n">restore</span> <span class="ow">-&gt;</span>
+      <span class="n">runLocalProcess</span> <span class="n">lproc</span> <span class="p">(</span><span class="n">p</span> <span class="p">(</span><span class="n">liftRestore</span> <span class="n">restore</span><span class="p">))</span>
+  <span class="kr">where</span>
+    <span class="n">liftRestore</span> <span class="ow">::</span> <span class="p">(</span><span class="n">forall</span> <span class="n">a</span><span class="o">.</span> <span class="kt">IO</span> <span class="n">a</span> <span class="ow">-&gt;</span> <span class="kt">IO</span> <span class="n">a</span><span class="p">)</span>
+                <span class="ow">-&gt;</span> <span class="p">(</span><span class="n">forall</span> <span class="n">a</span><span class="o">.</span> <span class="kt">Process</span> <span class="n">a</span> <span class="ow">-&gt;</span> <span class="kt">Process</span> <span class="n">a</span><span class="p">)</span>
+    <span class="n">liftRestore</span> <span class="n">restoreIO</span> <span class="ow">=</span> <span class="nf">\</span><span class="n">p2</span> <span class="ow">-&gt;</span> <span class="kr">do</span>
+      <span class="n">ourLocalProc</span> <span class="ow">&lt;-</span> <span class="n">ask</span>
+      <span class="n">liftIO</span> <span class="o">$</span> <span class="n">restoreIO</span> <span class="o">$</span> <span class="n">runLocalProcess</span> <span class="n">ourLocalProc</span> <span class="n">p2</span>
+
+<span class="c1">-- | Lift &#39;Control.Exception.onException&#39;</span>
+<span class="nf">onException</span> <span class="ow">::</span> <span class="kt">Process</span> <span class="n">a</span> <span class="ow">-&gt;</span> <span class="kt">Process</span> <span class="n">b</span> <span class="ow">-&gt;</span> <span class="kt">Process</span> <span class="n">a</span>
+<span class="nf">onException</span> <span class="n">p</span> <span class="n">what</span> <span class="ow">=</span> <span class="n">p</span> <span class="p">`</span><span class="n">catch</span><span class="p">`</span> <span class="nf">\</span><span class="n">e</span> <span class="ow">-&gt;</span> <span class="kr">do</span> <span class="kr">_</span> <span class="ow">&lt;-</span> <span class="n">what</span>
+                                        <span class="n">liftIO</span> <span class="o">$</span> <span class="n">throwIO</span> <span class="p">(</span><span class="n">e</span> <span class="ow">::</span> <span class="kt">SomeException</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><cite>distributed-process</cite> needs to do this sort of thing to keep its dependency
+list small, but do we really want to write this for every transformer stack
+we use in our own applications? No! And we do not have to, thanks to
+the [monad-control][mctrl] and [lifted-base][lbase] libraries.</p>
+<p>[monad-control][mctrl] provides several typeclasses and helper functions
+that make it possible to fully generalize the wrapping/unwrapping required
+to keep transformer effects stashed away while actions run in the base monad. Of
+most concern to end users of this library are the typeclass [MonadBase][mb] and [MonadBaseControl][mbc].
+How it works is beyond the scope of this tutorial, but there is an excellent and thorough
+explanation written by Michael Snoyman which is available [here][mctrlt].</p>
+<p>[lifted-base][lbase] takes advantage of these typeclasses to provide lifted versions of many functions
+in the Haskell base library. For example, [Control.Exception.Lifted][lexc] has a definition of
+bracket that looks like this:</p>
+<div class="highlight-haskell"><div class="highlight"><pre><span class="nf">bracket</span> <span class="ow">::</span> <span class="kt">MonadBaseControl</span> <span class="kt">IO</span> <span class="n">m</span>
+        <span class="ow">=&gt;</span> <span class="n">m</span> <span class="n">a</span>         <span class="o">--^</span> <span class="n">computation</span> <span class="n">to</span> <span class="n">run</span> <span class="n">first</span> <span class="p">(</span><span class="s">&quot;acquire resource&quot;</span><span class="p">)</span>
+        <span class="ow">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="ow">-&gt;</span> <span class="n">m</span> <span class="n">b</span><span class="p">)</span>  <span class="o">--^</span> <span class="n">computation</span> <span class="n">to</span> <span class="n">run</span> <span class="n">last</span> <span class="p">(</span><span class="s">&quot;release resource&quot;</span><span class="p">)</span>
+        <span class="ow">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="ow">-&gt;</span> <span class="n">m</span> <span class="n">c</span><span class="p">)</span>  <span class="o">--^</span> <span class="n">computation</span> <span class="n">to</span> <span class="n">run</span> <span class="kr">in</span><span class="o">-</span><span class="n">between</span>
+        <span class="ow">-&gt;</span> <span class="n">m</span> <span class="n">c</span>
+</pre></div>
+</div>
+<p>It is just the same as the version found in base, except it is generalized to work
+with actions in any monad that implements [MonadBaseControl IO][mbc]. [monad-control][mctrl] defines
+instances for the standard transformers, but that instance requires the base monad
+(in this case, <cite>Process</cite>) to also have an instance of these classes.</p>
+<p>To address this the [distributed-process-monad-control][dpmc] package
+provides orphan instances of the <cite>Process</cite> type for both [MonadBase IO][mb] and [MonadBaseControl IO][mbc].
+After importing these, we can rewrite our <cite>fetchUser</cite> function to use the instance of bracket
+provided by [lifted-base][lbase].</p>
+<div class="highlight-haskell"><div class="highlight"><pre><span class="c1">-- ...</span>
+<span class="kr">import</span> <span class="nn">Control.Monad.Catch</span> <span class="k">as</span> <span class="n">Catch</span>
+
+<span class="c1">-- ...</span>
+
+<span class="nf">fetchUser</span> <span class="ow">::</span> <span class="kt">String</span> <span class="ow">-&gt;</span> <span class="kt">AppProcess</span> <span class="p">(</span><span class="kt">Maybe</span> <span class="kt">User</span><span class="p">)</span>
+<span class="nf">fetchUser</span> <span class="n">email</span> <span class="ow">=</span>
+  <span class="kt">Catch</span><span class="o">.</span><span class="n">bracket</span> <span class="n">openDB</span>
+                <span class="n">closeDB</span>
+          <span class="o">$</span> <span class="nf">\</span><span class="n">db</span> <span class="ow">-&gt;</span> <span class="n">liftIO</span> <span class="o">$</span> <span class="kt">DB</span><span class="o">.</span><span class="n">query</span> <span class="n">db</span> <span class="n">email</span>
+</pre></div>
+</div>
+<p>[lifted-base][lbase] also provides conveniences like [MVar][lmvar] and other concurrency primitives that
+operate in [MonadBase IO][mb]. One benefit here is that your code is not sprinkled with
+liftIO; but [MonadBaseControl IO][mbc] also makes things like a lifted [withMVar][lmvar-with] possible - which is
+really just a specialization of [bracket][lbrkt]. You will also find lots of other libraries on hackage which
+use these instances - at present count there are more than 150 [packages using it][reverse].</p>
+<p>One note of caution: This instance can enable use of functions such as <cite>forkIO</cite> (or, <cite>fork</cite> from lifted-base[lbase]) which compromise invariants in the <cite>Process</cite> monad and can lead to confusing and subtle issues. Always use the Cloud Haskell functions such as spawnLocal instead.</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="getting-to-messages.html" class="btn btn-neutral float-right" title="4. Getting to messaging" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="getting-started.html" class="btn btn-neutral" title="2. Getting Started" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Haskell distributed team.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.7',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

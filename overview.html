@@ -1,0 +1,362 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>1. Overview &mdash; Cloud Haskell User Guide</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Cloud Haskell User Guide" href="index.html"/>
+        <link rel="next" title="2. Getting Started" href="tutorial/getting-started.html"/>
+        <link rel="prev" title="Welcome to Haskell Distributed’s documentation!" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Cloud Haskell
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">1. Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/getting-started.html">2. Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-started.html#setting-up-the-project">2.1. Setting up the project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-started.html#creating-a-node">2.2. Creating a node</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-started.html#sending-messages">2.3. Sending messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-started.html#serializable-data">2.4. Serializable Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-started.html#spawning-remote-processes">2.5. Spawning Remote Processes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/getting-to-know-processes.html">3. Getting to know Processes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-know-processes.html#processes">3.1. Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-know-processes.html#process-lifetime">3.2. Process Lifetime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-know-processes.html#monitoring-and-linking">3.3. Monitoring and Linking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-know-processes.html#getting-process-info">3.4. Getting Process Info</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-know-processes.html#concurrency-and-distribution">3.5. Concurrency and Distribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-know-processes.html#linking-and-monitoring">3.6. Linking and monitoring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-know-processes.html#stopping-processes">3.7. Stopping Processes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/getting-to-messages.html">4. Getting to messaging</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-messages.html#message-ordering">4.1. Message Ordering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-messages.html#selective-receive">4.2. Selective Receive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-messages.html#advanced-mailbox-processing">4.3. Advanced Mailbox Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-messages.html#typed-channels">4.4. Typed Channels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-messages.html#monad-transformer-stacks">4.5. Monad Transformer Stacks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-messages.html#what-is-serializable">4.6. What is Serializable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-messages.html#id1">4.7. Typed Channels</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="architecture/network-transport.html">5. Network Transport Abstraction Layer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managing-topologies.html">6. Managing Topologies</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="managing-topologies.html#overview">6.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="managing-topologies.html#a-simple-example">6.2. A Simple Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="managing-topologies.html#master-slave-configurations">6.3. Master Slave Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="managing-topologies.html#other-topologies-and-backends">6.4. Other Topologies and Backends</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="managed-process.html">7. Distributed-process platform</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="managed-process.html#managed-process-tutorial">7.1. Managed Process Tutorial</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="managed-process.html#introduction">7.1.1. Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managed-process.html#managed-processes">7.1.2. Managed Processes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managed-process.html#a-basic-example">7.1.3. A Basic Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managed-process.html#building-a-task-queue">7.1.4. Building a Task Queue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managed-process.html#implementing-the-client">7.1.5. Implementing the client</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managed-process.html#implementing-the-server">7.1.6. Implementing the server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managed-process.html#making-use-of-async">7.1.7. Making use of Async</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="5ch.html">8. ![Sup1: ][sup1]</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5ch.html#sup2-sup2">9. ![Sup2: ][sup2]</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5ch.html#sup3-sup3">10. ![Sup3: ][sup3]</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6ch.html">11. Advanced Managed Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial-NT2.html">12. Programming with Network.Transport</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Cloud Haskell</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>1. Overview</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/overview.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="overview">
+<h1>1. Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
+<p>This is the <cite>Cloud Haskell Platform</cite>. Cloud Haskell is a set of libraries that bring
+Erlang-style concurrency and distribution to Haskell programs. This
+project is an implementation of that distributed computing interface, where
+processes communicate with one another through explicit message passing rather
+than shared memory.</p>
+<p>Originally described by the joint [Towards Haskell in the Cloud][haskell11-ch] paper,
+Cloud Haskell has been re-written from the ground up and supports a rich and
+growing number of features for</p>
+<ul class="simple">
+<li>building concurrent applications using asynchronous message passing</li>
+<li>building distributed computing applications</li>
+<li>building fault tolerant systems</li>
+<li>running Cloud Haskell nodes on various network transports</li>
+<li>working with several network transport implementations (and more in the pipeline)</li>
+<li>supporting <em>static</em> values (required for remote communication)</li>
+</ul>
+<p>There is a [presentation][fun201202-coutts] on Cloud Haskell and this reimplementation,
+which is worth reading in conjunction with the documentation and wiki pages on this website..</p>
+<p>In this book we are covering many concepts related to cloud haskell. Book is split
+into tree parts:</p>
+<dl class="docutils">
+<dt>Tutorial</dt>
+<dd>Tutorial that covers all basic concepts of the <cite>distributed-process</cite> package,
+that is the core of the <cite>Cloud Haskell</cite>. After reading this manual one can build
+her own distributed systems using Cloud Haskell and build her own components</dd>
+<dt>Architecture</dt>
+<dd>In depth description of the components and architecture decisions lead to those.
+This part is not required in order to write your own applications, but still
+may be useful for understanding how and why things work. This may be helpful in
+building your own big systems.</dd>
+<dt>Cookbook</dt>
+<dd>A number of receipts and short tutorials describing how to implement certain
+snippets. Description of the <cite>Distributed process platform</cite> packages can be
+found here.</dd>
+</dl>
+<p>Cloud Haskell comprises the following components, some of which are complete,
+others experimental.</p>
+<dl class="docutils">
+<dt><a class="reference external" href="http://hackage.haskell.org/package/distributed-process">distributed-process</a></dt>
+<dd>Base concurrency and distribution support</dd>
+<dt><a class="reference external" href="http://hackage.haskell.org/package/distributed-process-platform">distributed-process-platform</a></dt>
+<dd>meta package for The Cloud Haskell Platform - APIs</dd>
+<dt><a class="reference external" href="http://hackage.haskell.org/package/distributed-static">distributed-static</a></dt>
+<dd>Support for static values</dd>
+<dt><a class="reference external" href="http://hackage.haskell.org/package/rank1dynamic">rank1dynamic</a></dt>
+<dd>Like <cite>Data.Dynamic</cite> and <cite>Data.Typeable</cite> but supporting polymorphic values</dd>
+<dt><a class="reference external" href="http://hackage.haskell.org/package/network-transport">network-transport</a></dt>
+<dd>Generic <cite>Network.Transport</cite> API</dd>
+<dt><a class="reference external" href="http://hackage.haskell.org/package/network-transport-tcp">network-transport-tcp</a></dt>
+<dd>TCP realisation of <cite>Network.Transport</cite></dd>
+<dt><a class="reference external" href="http://hackage.haskell.org/package/network-transport-inmemory">network-transport-inmemory</a></dt>
+<dd>In-memory realisation of <cite>Network.Transport</cite> (incomplete)</dd>
+<dt><a class="reference external" href="http://hackage.haskell.org/package/network-transport-composed">network-transport-composed</a></dt>
+<dd>Compose two transports (very preliminary)</dd>
+<dt><a class="reference external" href="http://hackage.haskell.org/package/distributed-process-simplelocalnet">distributed-process-simplelocalnet</a></dt>
+<dd>Simple backend for local networks</dd>
+<dt><a class="reference external" href="http://hackage.haskell.org/package/distributed-process-azure">distributed-process-azure</a></dt>
+<dd>Azure backend for Cloud Haskell (proof of concept)</dd>
+</dl>
+<p>One of Cloud Haskell&#8217;s goals is to separate the transport layer from the
+<em>process layer</em>, so that the transport backend is entirely independent. In fact
+other projects can and do reuse the transport layer, even if they don&#8217;t use or
+have their own process layer (see e.g. [HdpH][hdph]).</p>
+<p>Abstracting over the transport layer allows different protocols for
+message passing, including TCP/IP, UDP, <a class="reference external" href="http://en.wikipedia.org/wiki/Message_Passing_Interface">MPI</a>,
+<a class="reference external" href="http://www.olcf.ornl.gov/center-projects/common-communication-interface/">CCI</a>,
+<a class="reference external" href="http://zeromq.org">ZeroMQ</a>, <a class="reference external" href="http://openssh.com">SSH</a>, MVars, Unix pipes, and more.
+Each of these transports provides its own implementation of the <cite>Network.Transport</cite> API
+and provide a means of creating new connections for use within <cite>Control.Distributed.Process</cite>.</p>
+<p>The following diagram shows dependencies between the various subsystems,
+in an application using Cloud Haskell, where arrows represent explicit
+directional dependencies.</p>
+<p class="graphviz">
+<img src="_images/graphviz-7c01cfbf1d65da31e7d864d0749fa6723a305bac.png" alt="digraph {
+   app-&gt;dp-&gt;nt;
+   app-&gt;chb-&gt;nti-&gt;hctl;
+   app{title=&quot;Application&quot;};
+   dp{title=&quot;Cloud Haskell\n(distributed-process)&quot;};
+   nt{title=&quot;Transport Interface\n(network-transport)&quot;};
+   chb{title=&quot;Cloud Haskell Backend\n(distributed-process-*)&quot;};
+   nti{title=&quot;Transport Implementation\n(network-transport-*)&quot;};
+   hctl{title=&quot;Haskell/C Transport Library&quot;};
+}" />
+</p>
+<p>In this diagram, the various nodes roughly correspond to specific modules:</p>
+<blockquote>
+<div>Cloud Haskell                : Control.Distributed.Process
+Cloud Haskell                : Control.Distributed.Process.*
+Transport Interface          : Network.Transport
+Transport Implementation     : Network.Transport.*</div></blockquote>
+<p>An application is built using the primitives provided by the Cloud
+Haskell layer, provided by the <cite>Control.Distributed.Process</cite> module, which
+defines abstractions such as nodes and processes.</p>
+<p>The application also depends on a Cloud Haskell Backend, which
+provides functions to allow the initialisation of the transport layer
+using whatever topology might be appropriate to the application.</p>
+<p>It is, of course, possible to create new Cloud Haskell nodes by
+using a Network Transport Backend such as <cite>Network.Transport.TCP</cite>
+directly.</p>
+<p>The Cloud Haskell interface and backend make use of the Transport
+interface provided by the <cite>Network.Transport</cite> module.
+This also serves as an interface for the <cite>Network.Transport.*</cite>
+module, which provides a specific implementation for this transport,
+and may, for example, be based on some external library written in
+Haskell or C.</p>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tutorial/getting-started.html" class="btn btn-neutral float-right" title="2. Getting Started" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Welcome to Haskell Distributed’s documentation!" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Haskell distributed team.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.7',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

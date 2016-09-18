@@ -1,0 +1,478 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>4. Getting to messaging &mdash; Cloud Haskell User Guide</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Cloud Haskell User Guide" href="../index.html"/>
+        <link rel="next" title="5. Network Transport Abstraction Layer" href="../architecture/network-transport.html"/>
+        <link rel="prev" title="3. Getting to know Processes" href="getting-to-know-processes.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Cloud Haskell
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">1. Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">2. Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#setting-up-the-project">2.1. Setting up the project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#creating-a-node">2.2. Creating a node</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#sending-messages">2.3. Sending messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#serializable-data">2.4. Serializable Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#spawning-remote-processes">2.5. Spawning Remote Processes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="getting-to-know-processes.html">3. Getting to know Processes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting-to-know-processes.html#concurrency-and-distribution">3.1. Concurrency and Distribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-to-know-processes.html#process-lifetime">3.2. Process Lifetime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-to-know-processes.html#monitoring-and-linking">3.3. Monitoring and Linking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-to-know-processes.html#getting-process-info">3.4. Getting Process Info</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-to-know-processes.html#monad-transformer-stacks">3.5. Monad Transformer Stacks</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">4. Getting to messaging</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-serializable">4.1. What is Serializable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#message-ordering">4.2. Message Ordering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#selective-receive">4.3. Selective Receive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#advanced-mailbox-processing">4.4. Advanced Mailbox Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#typed-channels">4.5. Typed Channels</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/network-transport.html">5. Network Transport Abstraction Layer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../managing-topologies.html">6. Managing Topologies</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../managing-topologies.html#overview">6.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managing-topologies.html#a-simple-example">6.2. A Simple Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managing-topologies.html#master-slave-configurations">6.3. Master Slave Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../managing-topologies.html#other-topologies-and-backends">6.4. Other Topologies and Backends</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../managed-process.html">7. Distributed-process platform</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../managed-process.html#managed-process-tutorial">7.1. Managed Process Tutorial</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../managed-process.html#introduction">7.1.1. Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../managed-process.html#managed-processes">7.1.2. Managed Processes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../managed-process.html#a-basic-example">7.1.3. A Basic Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../managed-process.html#building-a-task-queue">7.1.4. Building a Task Queue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../managed-process.html#implementing-the-client">7.1.5. Implementing the client</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../managed-process.html#implementing-the-server">7.1.6. Implementing the server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../managed-process.html#making-use-of-async">7.1.7. Making use of Async</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../5ch.html">8. ![Sup1: ][sup1]</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../5ch.html#sup2-sup2">9. ![Sup2: ][sup2]</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../5ch.html#sup3-sup3">10. ![Sup3: ][sup3]</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../6ch.html">11. Advanced Managed Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial-NT2.html">12. Programming with Network.Transport</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">Cloud Haskell</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+    <li>4. Getting to messaging</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/tutorial/getting-to-messages.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="getting-to-messaging">
+<h1>4. Getting to messaging<a class="headerlink" href="#getting-to-messaging" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-is-serializable">
+<h2>4.1. What is Serializable<a class="headerlink" href="#what-is-serializable" title="Permalink to this headline">¶</a></h2>
+<p>Processes can send data if the type implements the <code class="docutils literal"><span class="pre">Serializable</span></code> typeclass,
+which is done indirectly by implementing <code class="docutils literal"><span class="pre">Binary</span></code> and deriving <code class="docutils literal"><span class="pre">Typeable</span></code>.
+Implementations are already provided for primitives and some commonly used
+data structures. As programmers, we see the messages in nice high-level form
+(e.g., <code class="docutils literal"><span class="pre">Int</span></code>, <code class="docutils literal"><span class="pre">String</span></code>, <code class="docutils literal"><span class="pre">Ping</span></code>, <code class="docutils literal"><span class="pre">Pong</span></code>, etc), however these data have to be
+encoded in order to be sent over a communications channel.</p>
+<p>Not all types are <code class="docutils literal"><span class="pre">Serializable</span></code>, for example concurrency primitives such as
+<code class="docutils literal"><span class="pre">MVar</span></code> and <code class="docutils literal"><span class="pre">TVar</span></code> are meaningless outside the context of threads with a shared
+memory. Cloud Haskell programs remain free to use these constructs within
+processes or within processes on the same machine though. If you want to
+pass data between processes using <em>ordinary</em> concurrency primitives such as
+<code class="docutils literal"><span class="pre">STM</span></code> then you&#8217;re free to do so. Processes spawned locally can share
+types such as <code class="docutils literal"><span class="pre">TMVar</span></code> just as normal Haskell threads would.</p>
+</div>
+<div class="section" id="message-ordering">
+<h2>4.2. Message Ordering<a class="headerlink" href="#message-ordering" title="Permalink to this headline">¶</a></h2>
+<p>We have already met the <code class="docutils literal"><span class="pre">send</span></code> primitive, used to deliver messages from one
+process to another. Here&#8217;s a review of what we&#8217;ve learned about <code class="docutils literal"><span class="pre">send</span></code> thus far:</p>
+<ol class="arabic simple">
+<li>sending is asynchronous (i.e., it does not block the caller)</li>
+<li>sending <strong>never</strong> fails, regardless of the state of the recipient process</li>
+<li>even if a message is received, there is <strong>no</strong> guarantee <strong>when</strong> it will arrive</li>
+<li>there are <strong>no</strong> guarantees that the message will be received at all</li>
+</ol>
+<p>Asynchronous sending buys us several benefits. Improved concurrency is
+possible, because processes need not block or wait for acknowledgements,
+nor does error handling need to be implemented each time a message is sent.
+Consider a stream of messages sent from one process to another. If the
+stream consists of messages <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code>, <code class="docutils literal"><span class="pre">c</span></code> and we have seen <code class="docutils literal"><span class="pre">c</span></code>, then we know for
+certain that we will have already seen <code class="docutils literal"><span class="pre">a</span></code>, <code class="docutils literal"><span class="pre">b</span></code> (in that order), so long as the
+messages were sent to us by the same peer process.</p>
+<p>When two concurrent process exchange messages, Cloud Haskell guarantees that
+messages will be delivered in FIFO order, if at all. No such guarantee exists
+between $N$ processes where $N &gt; 1$, so if processes _A_ and _B_ are both
+communicating (concurrently) with process _C_, the ordering guarantee will
+only hold for each pair of interactions, i.e., between _A_ and _C_ and/or
+_B_ and _C_ the ordering will be guaranteed, but not between _A_ and _B_
+with regards messages sent to _C_.</p>
+<p>Because the mailbox contains messages of varying types, when we <cite>expect</cite>
+a message, we eschew the ordering because we&#8217;re searching for a message
+whose contents can be decoded to a specific type. Of course, we may <strong>want</strong>
+to process messages in the precise order which they arrived. To achieve
+this, we must defer the type checking that would normally cause a traversal
+of the mailbox and extract the _raw_ message ourselves. This can be achieved
+using <cite>receive</cite> and <cite>matchAny</cite>, as we will demonstrate later.</p>
+</div>
+<div class="section" id="selective-receive">
+<h2>4.3. Selective Receive<a class="headerlink" href="#selective-receive" title="Permalink to this headline">¶</a></h2>
+<p>Processes dequeue messages (from their mailbox) using the [<cite>expect</cite>][1]
+and [<cite>receive</cite>][2] family of primitives. Both take an optional timeout,
+allowing the expression to evaluate to <cite>Nothing</cite> if no matching input
+is found.</p>
+<p>The [<cite>expect</cite>][1] primitive blocks until a message matching the expected type
+(of the expression) is found in the process&#8217; mailbox. If a match is found by
+scanning the mailbox, it is dequeued and returned, otherwise the caller
+(i.e., the calling thread/process) is blocked until a message of the expected
+type is delivered to the mailbox. Let&#8217;s take a look at this in action:</p>
+<div class="highlight-haskell"><div class="highlight"><pre><span class="nf">demo</span> <span class="ow">::</span> <span class="kt">Process</span> <span class="nb">()</span>
+<span class="nf">demo</span> <span class="ow">=</span> <span class="kr">do</span>
+    <span class="n">listener</span> <span class="ow">&lt;-</span> <span class="n">spawnLocal</span> <span class="n">listen</span>
+    <span class="n">send</span> <span class="n">listener</span> <span class="s">&quot;hello&quot;</span>
+    <span class="n">getSelfPid</span> <span class="o">&gt;&gt;=</span> <span class="n">send</span> <span class="n">listener</span>
+    <span class="nb">()</span> <span class="ow">&lt;-</span> <span class="n">expect</span>
+  <span class="kr">where</span>
+    <span class="n">listen</span> <span class="ow">=</span> <span class="kr">do</span>
+      <span class="n">third</span> <span class="ow">&lt;-</span> <span class="n">expect</span> <span class="ow">::</span> <span class="kt">Process</span> <span class="kt">ProcessId</span>
+      <span class="n">first</span> <span class="ow">&lt;-</span> <span class="n">expect</span> <span class="ow">::</span> <span class="kt">Process</span> <span class="kt">String</span>
+      <span class="n">second</span> <span class="ow">&lt;-</span> <span class="n">expectTimeout</span> <span class="mi">100000</span> <span class="ow">::</span> <span class="kt">Process</span> <span class="kt">String</span>
+      <span class="n">mapM_</span> <span class="p">(</span><span class="n">say</span> <span class="o">.</span> <span class="n">show</span><span class="p">)</span> <span class="p">[</span><span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="n">third</span><span class="p">]</span>
+      <span class="n">send</span> <span class="n">third</span> <span class="nb">()</span>
+</pre></div>
+</div>
+<p>This program will print <code class="docutils literal"><span class="pre">&quot;hello&quot;</span></code>, then <code class="docutils literal"><span class="pre">Nothing</span></code> and finally <code class="docutils literal"><span class="pre">pid://...</span></code>.
+The first <code class="docutils literal"><span class="pre">expect</span></code> - labelled &#8220;third&#8221; because of the order in which we
+know it will arrive in our mailbox - <strong>will</strong> succeed, since the parent process
+sends its <code class="docutils literal"><span class="pre">ProcessId</span></code> after the string &#8220;hello&#8221;, yet the listener blocks until it
+can dequeue the <code class="docutils literal"><span class="pre">ProcessId</span></code> before &#8220;expecting&#8221; a string. The second <code class="docutils literal"><span class="pre">expect</span></code>
+(labelled &#8220;first&#8221;) also succeeds, demonstrating that the listener has selectively
+removed messages from its mailbox based on their type rather than the order in
+which they arrived. The third <code class="docutils literal"><span class="pre">expect</span></code> will timeout and evaluate to <code class="docutils literal"><span class="pre">Nothing</span></code>,
+because only one string is ever sent to the listener and that has already been
+removed from the mailbox. The removal of messages from the process&#8217; mailbox based
+on type is what makes this program viable - without this &#8220;selective receiving&#8221;,
+the program would block and never complete.</p>
+<p>By contrast, the [<cite>receive</cite>][2] family of primitives take a list of <code class="docutils literal"><span class="pre">Match</span></code>
+objects, each derived from evaluating a [<cite>match</cite>][3] style primitive. This
+subject was covered briefly in the first tutorial. Matching on messages allows
+us to separate the type(s) of messages we can handle from the type that the
+whole <code class="docutils literal"><span class="pre">receive</span></code> expression evaluates to.</p>
+<p>Consider the following snippet:</p>
+<div class="highlight-haskell"><div class="highlight"><pre><span class="nf">usingReceive</span> <span class="ow">=</span> <span class="kr">do</span>
+  <span class="nb">()</span> <span class="ow">&lt;-</span> <span class="n">receiveWait</span> <span class="p">[</span>
+      <span class="n">match</span> <span class="p">(</span><span class="nf">\</span><span class="p">(</span><span class="n">s</span> <span class="ow">::</span> <span class="kt">String</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="n">say</span> <span class="n">s</span><span class="p">)</span>
+    <span class="p">,</span> <span class="n">match</span> <span class="p">(</span><span class="nf">\</span><span class="p">(</span><span class="n">i</span> <span class="ow">::</span> <span class="kt">Int</span><span class="p">)</span>    <span class="ow">-&gt;</span> <span class="n">say</span> <span class="o">$</span> <span class="n">show</span> <span class="n">i</span><span class="p">)</span>
+    <span class="p">]</span>
+</pre></div>
+</div>
+<p>Note that each of the matches in the list must evaluate to the same type,
+as the type signature indicates: <code class="docutils literal"><span class="pre">receiveWait</span> <span class="pre">::</span> <span class="pre">[Match</span> <span class="pre">b]</span> <span class="pre">-&gt;</span> <span class="pre">Process</span> <span class="pre">b</span></code>.</p>
+<p>The behaviour of <code class="docutils literal"><span class="pre">receiveWait</span></code> differs from <code class="docutils literal"><span class="pre">receiveTimeout</span></code> in that it
+blocks forever (until a match is found in the process&#8217; mailbox), whereas the
+variant taking a timeout will return <code class="docutils literal"><span class="pre">Nothing</span></code> unless a match is found within
+the specified time interval. Note that as with <code class="docutils literal"><span class="pre">System.Timeout</span></code>, the only
+guarantee we have about a timeout based function is that it will not
+expire _before_ the given interval. Both functions scan the mailbox in FIFO
+order, evaluating the list of <code class="docutils literal"><span class="pre">match</span></code> expressions in declarative
+(i.e., insertion) order until one of the matches succeeds or the operation
+times out.</p>
+</div>
+<div class="section" id="advanced-mailbox-processing">
+<h2>4.4. Advanced Mailbox Processing<a class="headerlink" href="#advanced-mailbox-processing" title="Permalink to this headline">¶</a></h2>
+<p>There are times when it is desirable to take a message from our mailbox without
+explicitly specifying its type. Not only is this a useful capability, it is the
+<em>only</em> way to process messages in the precise order they were received.</p>
+<p>To see how this works in practise, let&#8217;s consider the <code class="docutils literal"><span class="pre">relay</span></code> primitive that
+ships with distributed-process. This utility function starts a process that
+simply dequeues _any_ messages it receives and forwards them to some other process.
+In order to dequeue messages regardless of their type, this code relies on the
+<code class="docutils literal"><span class="pre">matchAny</span></code> primitive, which has the following type:</p>
+<div class="highlight-haskell"><div class="highlight"><pre><span class="nf">matchAny</span> <span class="ow">::</span> <span class="n">forall</span> <span class="n">b</span><span class="o">.</span> <span class="p">(</span><span class="kt">Message</span> <span class="ow">-&gt;</span> <span class="kt">Process</span> <span class="n">b</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="kt">Match</span> <span class="n">b</span>
+</pre></div>
+</div>
+<p>Since forwarding <em>raw messages</em> (without decoding them first) is a common pattern
+in Cloud Haskell programs, there is also a primitive to do that for us:</p>
+<div class="highlight-haskell"><div class="highlight"><pre><span class="nf">forward</span> <span class="ow">::</span> <span class="kt">Message</span> <span class="ow">-&gt;</span> <span class="kt">ProcessId</span> <span class="ow">-&gt;</span> <span class="kt">Process</span> <span class="nb">()</span>
+</pre></div>
+</div>
+<p>Given these types, we can see that in order to combine <code class="docutils literal"><span class="pre">matchAny</span></code> with <code class="docutils literal"><span class="pre">forward</span></code>
+we need to either _flip_ <code class="docutils literal"><span class="pre">forward</span></code> and apply the <code class="docutils literal"><span class="pre">ProcessId</span></code> (leaving us with
+the required type <code class="docutils literal"><span class="pre">Message</span> <span class="pre">-&gt;</span> <span class="pre">Process</span> <span class="pre">b</span></code>) or use a lambda - the actual implementation
+does the latter and looks like this:</p>
+<div class="highlight-haskell"><div class="highlight"><pre><span class="nf">relay</span> <span class="ow">::</span> <span class="kt">ProcessId</span> <span class="ow">-&gt;</span> <span class="kt">Process</span> <span class="nb">()</span>
+<span class="nf">relay</span> <span class="o">!</span><span class="n">pid</span> <span class="ow">=</span> <span class="n">forever&#39;</span> <span class="o">$</span> <span class="n">receiveWait</span> <span class="p">[</span> <span class="n">matchAny</span> <span class="p">(</span><span class="nf">\</span><span class="n">m</span> <span class="ow">-&gt;</span> <span class="n">forward</span> <span class="n">m</span> <span class="n">pid</span><span class="p">)</span> <span class="p">]</span>
+</pre></div>
+</div>
+<p>This is pretty useful, but since <code class="docutils literal"><span class="pre">matchAny</span></code> operates on the raw <code class="docutils literal"><span class="pre">Message</span></code> type,
+we&#8217;re limited in what we can do with the messages we receive. In order to delve
+<em>inside</em> a message, we have to know its type. If we have an expression that operates
+on a specific type, we can _attempt_ to decode the message to that type and examine
+the result to see whether the decoding succeeds or not. There are two primitives
+we can use to that effect: <code class="docutils literal"><span class="pre">unwrapMessage</span></code> and <code class="docutils literal"><span class="pre">handleMessage</span></code>. Their types look like
+this:</p>
+<div class="highlight-haskell"><div class="highlight"><pre><span class="nf">unwrapMessage</span> <span class="ow">::</span> <span class="n">forall</span> <span class="n">m</span> <span class="n">a</span><span class="o">.</span> <span class="p">(</span><span class="kt">Monad</span> <span class="n">m</span><span class="p">,</span> <span class="kt">Serializable</span> <span class="n">a</span><span class="p">)</span> <span class="ow">=&gt;</span> <span class="kt">Message</span> <span class="ow">-&gt;</span> <span class="n">m</span> <span class="p">(</span><span class="kt">Maybe</span> <span class="n">a</span><span class="p">)</span>
+
+<span class="nf">handleMessage</span> <span class="ow">::</span> <span class="n">forall</span> <span class="n">m</span> <span class="n">a</span> <span class="n">b</span><span class="o">.</span> <span class="p">(</span><span class="kt">Monad</span> <span class="n">m</span><span class="p">,</span> <span class="kt">Serializable</span> <span class="n">a</span><span class="p">)</span> <span class="ow">=&gt;</span> <span class="kt">Message</span> <span class="ow">-&gt;</span> <span class="p">(</span><span class="n">a</span> <span class="ow">-&gt;</span> <span class="n">m</span> <span class="n">b</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="n">m</span> <span class="p">(</span><span class="kt">Maybe</span> <span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Of the two, <code class="docutils literal"><span class="pre">unwrapMessage</span></code> is the simpler, taking a raw <code class="docutils literal"><span class="pre">Message</span></code> and evaluating to
+<code class="docutils literal"><span class="pre">Maybe</span> <span class="pre">a</span></code> before returning that value in the monad <code class="docutils literal"><span class="pre">m</span></code>. If the type of the raw <code class="docutils literal"><span class="pre">Message</span></code>
+does not match our expectation, the result will be <code class="docutils literal"><span class="pre">Nothing</span></code>, otherwise <code class="docutils literal"><span class="pre">Just</span> <span class="pre">a</span></code>.</p>
+<p>The approach <cite>handleMessage</cite> takes is a bit more flexible, taking a function
+from <cite>a -&gt; m b</cite> and returning <cite>Just b</cite> if the underlying message is of type <cite>a</cite> (hence the
+operation can be executed and evaluate to <cite>Maybe b</cite>) or <cite>Nothing</cite> if the message&#8217;s type
+is incompatible with the handler function.</p>
+<p>Let&#8217;s look at <cite>handleMessage</cite> in action. Earlier on we looked at <cite>relay</cite> from
+distributed-process and now we&#8217;ll consider its sibling <cite>proxy</cite> - this takes a predicate,
+evaluates some input of type <cite>a</cite> and returns <cite>Process Bool</cite>, allowing us to run arbitrary
+<cite>Process</cite> code in order to decide whether or not the <cite>a</cite> is eligible to be forwarded to
+the relay <cite>ProcessId</cite>. The type of <cite>proxy</cite> is thus:</p>
+<p>{% highlight haskell %}
+proxy :: Serializable a =&gt; ProcessId -&gt; (a -&gt; Process Bool) -&gt; Process ()
+{% endhighlight %}</p>
+<p>Since <cite>matchAny</cite> operates on <cite>(Message -&gt; Process b)</cite> and <cite>handleMessage</cite> operates on
+<cite>a -&gt; Process b</cite> we can compose these to make our proxy server. We must not forward
+messages for which the predicate function evaluates to <cite>Just False</cite>, nor can we sensibly
+forward messages which the predicate function is unable to evaluate due to type
+incompatibility. This leaves us with the definition found in distributed-process:</p>
+<div class="highlight-haskell"><div class="highlight"><pre><span class="nf">proxy</span> <span class="n">pid</span> <span class="n">proc</span> <span class="ow">=</span> <span class="kr">do</span>
+  <span class="n">receiveWait</span> <span class="p">[</span>
+      <span class="n">matchAny</span> <span class="p">(</span><span class="nf">\</span><span class="n">m</span> <span class="ow">-&gt;</span> <span class="kr">do</span>
+                   <span class="n">next</span> <span class="ow">&lt;-</span> <span class="n">handleMessage</span> <span class="n">m</span> <span class="n">proc</span>
+                   <span class="kr">case</span> <span class="n">next</span> <span class="kr">of</span>
+                     <span class="kt">Just</span> <span class="kt">True</span>  <span class="ow">-&gt;</span> <span class="n">forward</span> <span class="n">m</span> <span class="n">pid</span>
+                     <span class="kt">Just</span> <span class="kt">False</span> <span class="ow">-&gt;</span> <span class="n">return</span> <span class="nb">()</span>  <span class="c1">-- explicitly ignored</span>
+                     <span class="kt">Nothing</span>    <span class="ow">-&gt;</span> <span class="n">return</span> <span class="nb">()</span><span class="p">)</span> <span class="c1">-- un-routable / cannot decode</span>
+    <span class="p">]</span>
+  <span class="n">proxy</span> <span class="n">pid</span> <span class="n">proc</span>
+</pre></div>
+</div>
+<p>Beyond simple relays and proxies, the raw message handling capabilities available in
+distributed-process can be utilised to develop highly generic message processing code.
+All the richness of the distributed-process-platform APIs (such as <cite>ManagedProcess</cite>) which
+will be discussed in later tutorials are, in fact, built upon these families of primitives.</p>
+</div>
+<div class="section" id="typed-channels">
+<h2>4.5. Typed Channels<a class="headerlink" href="#typed-channels" title="Permalink to this headline">¶</a></h2>
+<p>While being able to send and receive any <code class="docutils literal"><span class="pre">Serializable</span></code> datum is very powerful, the burden
+of decoding types correctly at runtime is levied on the programmer and there are runtime
+overheads to be aware of (which will be covered in later tutorials). Fortunately,
+distributed-provides provides a type safe alternative to <code class="docutils literal"><span class="pre">send</span></code> and <code class="docutils literal"><span class="pre">receive</span></code>, in the form
+of <em>Typed Channels</em>. Channels work like a distributed equivalent of Haskell&#8217;s
+<cite>Control.Concurrent.Chan</cite>, however they have distinct ends: a single
+receiving port and a corollary send port. Represented by distinct ends, a <cite>SendPort a</cite> (which is <code class="docutils literal"><span class="pre">Serializable</span></code>)
+and <code class="docutils literal"><span class="pre">ReceivePort</span> <span class="pre">a</span></code> (which is not), channels are a lightweight and useful abstraction that
+provides a type safe interface for interacting with processes separately from their primary
+mailbox.</p>
+<p>Channels are created with <code class="docutils literal"><span class="pre">newChan</span> <span class="pre">::</span> <span class="pre">Process</span> <span class="pre">(SendPort</span> <span class="pre">a,</span> <span class="pre">ReceivePort</span> <span class="pre">a)</span></code>, with
+messages sent via <code class="docutils literal"><span class="pre">sendChan</span> <span class="pre">::</span> <span class="pre">SendPort</span> <span class="pre">a</span> <span class="pre">-&gt;</span> <span class="pre">a</span> <span class="pre">-&gt;</span> <span class="pre">Process</span> <span class="pre">()</span></code>. The <code class="docutils literal"><span class="pre">ReceivePort</span></code> can be
+passed directly to <code class="docutils literal"><span class="pre">receiveChan</span></code>, or used in a <code class="docutils literal"><span class="pre">receive{Wait,</span> <span class="pre">Timeout}</span></code> call via the
+<code class="docutils literal"><span class="pre">matchChan</span></code> primitive, so as to combine mailbox scans with channel reads.</p>
+<div class="highlight-haskell"><div class="highlight"><pre><span class="nf">channelsDemo</span> <span class="ow">::</span> <span class="kt">Process</span> <span class="nb">()</span>
+<span class="nf">channelsDemo</span> <span class="ow">=</span> <span class="kr">do</span>
+    <span class="p">(</span><span class="n">sp</span><span class="p">,</span> <span class="n">rp</span><span class="p">)</span> <span class="ow">&lt;-</span> <span class="n">newChan</span> <span class="ow">::</span> <span class="kt">Process</span> <span class="p">(</span><span class="kt">SendPort</span> <span class="kt">String</span><span class="p">,</span> <span class="kt">ReceivePort</span> <span class="kt">String</span><span class="p">)</span>
+
+    <span class="c1">-- send on a channel</span>
+    <span class="n">spawnLocal</span> <span class="o">$</span> <span class="n">sendChan</span> <span class="n">sp</span> <span class="s">&quot;hello!&quot;</span>
+
+    <span class="c1">-- receive on a channel</span>
+    <span class="n">m</span> <span class="ow">&lt;-</span> <span class="n">receiveChan</span> <span class="n">rp</span>
+    <span class="n">say</span> <span class="o">$</span> <span class="n">show</span> <span class="n">m</span>
+</pre></div>
+</div>
+<p>Channels are particularly useful when you are sending a message that needs a
+response, because we know exactly where to look for the reply.</p>
+<p>Channels can also allow message types to be simplified, as passing a
+<code class="docutils literal"><span class="pre">ProcessId</span></code> for the reply isn&#8217;t required. Channels aren&#8217;t so useful when we
+need to spawn a process and send a bunch a messages to it, then wait for
+replies however; we can’t send a <code class="docutils literal"><span class="pre">ReceivePort</span></code> since it is not <code class="docutils literal"><span class="pre">Serializable</span></code>.</p>
+<p><code class="docutils literal"><span class="pre">ReceivePort</span></code>s can be merged, so we can listen on several simultaneously. In the
+latest version of [distributed-process][distributed-process], we can listen for <em>regular</em> messages
+and multiple channels at the same time, using <code class="docutils literal"><span class="pre">matchChan</span></code> in the list of
+allowed matches passed <code class="docutils literal"><span class="pre">receiveWait</span></code> and <code class="docutils literal"><span class="pre">receiveTimeout</span></code>.</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../architecture/network-transport.html" class="btn btn-neutral float-right" title="5. Network Transport Abstraction Layer" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="getting-to-know-processes.html" class="btn btn-neutral" title="3. Getting to know Processes" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Haskell distributed team.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.7',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

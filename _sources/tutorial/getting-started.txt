@@ -1,20 +1,16 @@
-**************************
-Book
-**************************
-
 Getting Started
-===================
+===============
 
 In order to go through this tutorial, you will need a working Haskell
 environment. If you don't already have one follow the instructions
 `here <https://www.haskell.org/downloads>`_ to install the compiler and
 then
-`go here <https://github.com/commercialhaskell/stack/wiki/Downloads>`_
+`go here <https://docs.haskellstack.org/en/stable/README>`_
 to install ``stack``, a popular build tool for Haskell projects.
 
 Once you're up and running, you'll want to get hold of the
-``distributed-process`` library and a choice of network transport
-backend. This guide will use the ``network-transport-tcp`` backend, but
+:hackage-pkg:`distributed-process` library and a choice of network transport
+backend. This guide will use the :hackage-pkg:`network-transport-tcp` backend, but
 other backends are available on `Hackage <https://hackage.haskell.org>`_
 and `GitHub <https://github.com>`_.
 
@@ -36,7 +32,7 @@ executable section.
 Creating a node
 ---------------
 
-Cloud Haskell's *lightweight processes* reside on a "node", which must
+Cloud Haskell's ``lightweight processes`` reside on a "node", which must
 be initialised with a network transport implementation and a remote table.
 The latter is required so that physically separate nodes can identify known
 objects in the system (such as types and functions) when receiving messages
@@ -68,22 +64,22 @@ And now we have a running node.
 Sending messages
 ----------------
 
-We start a new process by evaluating ``runProcess``, which takes a node and
-a ``Process`` action to run, because our concurrent code will run in the
-``Process`` monad. Each process has an identifier associated to it. The process
-id can be used to send messages to the running process - here we will send one
+We start a new process by evaluating :distributed-process:`runProcess <Control-Distributed-Process-Node.html#v:runProcess>`,
+which takes a node and a ``Process`` action to run, because our concurrent code
+will run in the ``Process`` monad. Each process has an identifier associated to it.
+The process id can be used to send messages to the running process - here we will send one
 to ourselves!
 
 .. code-block:: haskell
 
-   -- in main
-     _ <- runProcess node $ do
-       -- get our own process id
-       self <- getSelfPid
-       send self "hello"
-       hello <- expect :: Process String
-       liftIO $ putStrLn hello
-     return ()
+  -- in main
+  _ <- runProcess node $ do
+    -- get our own process id
+    self <- getSelfPid
+    send self "hello"
+    hello <- expect :: Process String
+    liftIO $ putStrLn hello
+  return ()
 
 Note that we haven't deadlocked our own thread by sending to and receiving
 from its mailbox in this fashion. Sending messages is a completely
@@ -101,46 +97,46 @@ Let's spawn two processes on the same node and have them talk to each other:
 
 .. code-block:: haskell
 
-   import Control.Concurrent (threadDelay)
-   import Control.Monad (forever)
-   import Control.Distributed.Process
-   import Control.Distributed.Process.Node
-   import Network.Transport.TCP (createTransport, defaultTCPParameters)
-   
-   replyBack :: (ProcessId, String) -> Process ()
-   replyBack (sender, msg) = send sender msg
-   
-   logMessage :: String -> Process ()
-   logMessage msg = say $ "handling " ++ msg
-   
-   main :: IO ()
-   main = do
-     Right t <- createTransport "127.0.0.1" "10501" defaultTCPParameters
-     node <- newLocalNode t initRemoteTable
-     runProcess node $ do
-       -- Spawn another worker on the local node
-       echoPid <- spawnLocal $ forever $ do
-         -- Test our matches in order against each message in the queue
-         receiveWait [match logMessage, match replyBack]
-   
-       -- The `say` function sends a message to a process registered as "logger".
-       -- By default, this process simply loops through its mailbox and sends
-       -- any received log message strings it finds to stderr.
-   
-       say "send some messages!"
-       send echoPid "hello"
-       self <- getSelfPid
-       send echoPid (self, "hello")
-   
-       -- `expectTimeout` waits for a message or times out after "delay"
-       m <- expectTimeout 1000000
-       case m of
-         -- Die immediately - throws a ProcessExitException with the given reason.
-         Nothing  -> die "nothing came back!"
-         Just s -> say $ "got " ++ s ++ " back!"
-         
-       -- Without the following delay, the process sometimes exits before the messages are exchanged.
-       liftIO $ threadDelay 2000000
+  import Control.Concurrent (threadDelay)
+  import Control.Monad (forever)
+  import Control.Distributed.Process
+  import Control.Distributed.Process.Node
+  import Network.Transport.TCP (createTransport, defaultTCPParameters)
+
+  replyBack :: (ProcessId, String) -> Process ()
+  replyBack (sender, msg) = send sender msg
+
+  logMessage :: String -> Process ()
+  logMessage msg = say $ "handling " ++ msg
+
+  main :: IO ()
+  main = do
+    Right t <- createTransport "127.0.0.1" "10501" defaultTCPParameters
+    node <- newLocalNode t initRemoteTable
+    runProcess node $ do
+      -- Spawn another worker on the local node
+      echoPid <- spawnLocal $ forever $ do
+        -- Test our matches in order against each message in the queue
+        receiveWait [match logMessage, match replyBack]
+
+      -- The `say` function sends a message to a process registered as "logger".
+      -- By default, this process simply loops through its mailbox and sends
+      -- any received log message strings it finds to stderr.
+
+      say "send some messages!"
+      send echoPid "hello"
+      self <- getSelfPid
+      send echoPid (self, "hello")
+
+      -- `expectTimeout` waits for a message or times out after "delay"
+      m <- expectTimeout 1000000
+      case m of
+        -- Die immediately - throws a ProcessExitException with the given reason.
+        Nothing  -> die "nothing came back!"
+        Just s -> say $ "got " ++ s ++ " back!"
+
+      -- Without the following delay, the process sometimes exits before the messages are exchanged.
+      liftIO $ threadDelay 2000000
 
 Note that we've used ``receiveWait`` this time around to get a message.
 ``receiveWait`` and similarly named functions can be used with the
@@ -251,32 +247,32 @@ with a final, merged remote table for all modules in our program:
 
 .. code-block:: haskell
 
-     {-# LANGUAGE TemplateHaskell #-}
-     
-     import Control.Concurrent (threadDelay)
-     import Control.Monad (forever)
-     import Control.Distributed.Process
-     import Control.Distributed.Process.Closure
-     import Control.Distributed.Process.Node
-     import Network.Transport.TCP (createTransport, defaultTCPParameters)
-     
-     sampleTask :: (Int, String) -> Process ()
-     sampleTask (t, s) = liftIO (threadDelay (t * 1000000)) >> say s
-     
-     remotable ['sampleTask]
-     
-     myRemoteTable :: RemoteTable
-     myRemoteTable = Main.__remoteTable initRemoteTable
-     
-     main :: IO ()
-     main = do
-       Right transport <- createTransport "127.0.0.1" "10501" defaultTCPParameters
-       node <- newLocalNode transport myRemoteTable
-       runProcess node $ do
-         us <- getSelfNode
-         _ <- spawnLocal $ sampleTask (1 :: Int, "using spawnLocal")
-         pid <- spawn us $ $(mkClosure 'sampleTask) (1 :: Int, "using spawn")
-         liftIO $ threadDelay 2000000
+   {-# LANGUAGE TemplateHaskell #-}
+
+   import Control.Concurrent (threadDelay)
+   import Control.Monad (forever)
+   import Control.Distributed.Process
+   import Control.Distributed.Process.Closure
+   import Control.Distributed.Process.Node
+   import Network.Transport.TCP (createTransport, defaultTCPParameters)
+
+   sampleTask :: (Int, String) -> Process ()
+   sampleTask (t, s) = liftIO (threadDelay (t * 1000000)) >> say s
+
+   remotable ['sampleTask]
+
+   myRemoteTable :: RemoteTable
+   myRemoteTable = Main.__remoteTable initRemoteTable
+
+   main :: IO ()
+   main = do
+     Right transport <- createTransport "127.0.0.1" "10501" defaultTCPParameters
+     node <- newLocalNode transport myRemoteTable
+     runProcess node $ do
+       us <- getSelfNode
+       _ <- spawnLocal $ sampleTask (1 :: Int, "using spawnLocal")
+       pid <- spawn us $ $(mkClosure 'sampleTask) (1 :: Int, "using spawn")
+       liftIO $ threadDelay 2000000
 
 In the above example, we spawn ``sampleTask`` on node ``us`` in two
 different ways:
@@ -287,12 +283,3 @@ different ways:
   node identifier actually refers to the local node (i.e. ``us``). In
   this special case, no serialization is necessary, so passing an
   action directly rather than a ``Closure`` works just fine.
-
-------
-
-[1]: /static/doc/distributed-process/Control-Distributed-Process.html#v:Message
-[2]: http://hackage.haskell.org/package/distributed-process
-[3]: /static/doc/distributed-process-platform/Control-Distributed-Process-Platform-Async.html
-[4]: /static/doc/distributed-process-platform/Control-Distributed-Process-Platform-ManagedProcess.htmlv:callAsync
-[5]: http://hackage.haskell.org/packages/archive/distributed-process/latest/doc/html/Control-Distributed-Process-Internal-Primitives.html#t:Match
-[6]: http://hackage.haskell.org/packages/archive/distributed-process/latest/doc/html/Control-Distributed-Process-Closure.html

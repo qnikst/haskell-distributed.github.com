@@ -10,13 +10,16 @@ Contents:
 
 .. toctree::
    :glob:
-   :maxdepth: 2
+   :maxdepth: 3
    :numbered:
 
-   getting-started
-   2ch
-   3ch
-   4ch
+   overview
+   tutorial/getting-started
+   tutorial/getting-to-know-processes
+   tutorial/getting-to-messages
+   architecture/network-transport
+   managing-topologies
+   managed-process
    5ch
    6ch
    tutorial-NT2
