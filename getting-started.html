@@ -1,0 +1,366 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Getting Started &mdash; Haskell Distributed 0.6 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Haskell Distributed 0.6 documentation" href="index.html" />
+    <link rel="next" title="&lt;no title&gt;" href="2ch.html" />
+    <link rel="prev" title="Welcome to Haskell Distributed’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<p>In order to go through this tutorial, you will need a working Haskell
+environment. If you don&#8217;t already have one follow the instructions
+<a class="reference external" href="https://www.haskell.org/downloads">here</a> to install the compiler and
+then
+<a class="reference external" href="https://github.com/commercialhaskell/stack/wiki/Downloads">go here</a>
+to install <code class="docutils literal"><span class="pre">stack</span></code>, a popular build tool for Haskell projects.</p>
+<p>Once you&#8217;re up and running, you&#8217;ll want to get hold of the
+<code class="docutils literal"><span class="pre">distributed-process</span></code> library and a choice of network transport
+backend. This guide will use the <code class="docutils literal"><span class="pre">network-transport-tcp</span></code> backend, but
+other backends are available on <a class="reference external" href="https://hackage.haskell.org">Hackage</a>
+and <a class="reference external" href="https://github.com">GitHub</a>.</p>
+<div class="section" id="setting-up-the-project">
+<h2>Setting up the project<a class="headerlink" href="#setting-up-the-project" title="Permalink to this headline">¶</a></h2>
+<p>Starting a new Cloud Haskell project using <code class="docutils literal"><span class="pre">stack</span></code> is as easy as</p>
+<blockquote>
+<div>$ stack new</div></blockquote>
+<p>in a fresh new directory. This will populate the directory with
+a number of files, chiefly <code class="docutils literal"><span class="pre">stack.yaml</span></code> and <code class="docutils literal"><span class="pre">*.cabal</span></code> metadata files
+for the project. You&#8217;ll want to add <code class="docutils literal"><span class="pre">distributed-process</span></code> and
+<code class="docutils literal"><span class="pre">network-transport-tcp</span></code> to the <code class="docutils literal"><span class="pre">build-depends</span></code> stanza of the
+executable section.</p>
+</div>
+<div class="section" id="creating-a-node">
+<h2>Creating a node<a class="headerlink" href="#creating-a-node" title="Permalink to this headline">¶</a></h2>
+<p>Cloud Haskell&#8217;s <em>lightweight processes</em> reside on a &#8220;node&#8221;, which must
+be initialised with a network transport implementation and a remote table.
+The latter is required so that physically separate nodes can identify known
+objects in the system (such as types and functions) when receiving messages
+from other nodes. We will look at inter-node communication later, for now
+it will suffice to pass the default remote table, which defines the built-in
+types that Cloud Haskell needs at a minimum in order to run.</p>
+<p>In <code class="docutils literal"><span class="pre">app/Main.hs</span></code>, we start with our imports:</p>
+<blockquote>
+<div>import Network.Transport.TCP (createTransport, defaultTCPParameters)
+import Control.Distributed.Process
+import Control.Distributed.Process.Node</div></blockquote>
+<p>Our TCP network transport backend needs an IP address and port to get started
+with:</p>
+<blockquote>
+<div><p>main :: IO ()
+main = do</p>
+<blockquote>
+<div>Right t &lt;- createTransport &#8220;127.0.0.1&#8221; &#8220;10501&#8221; defaultTCPParameters
+node &lt;- newLocalNode t initRemoteTable
+....</div></blockquote>
+</div></blockquote>
+<p>And now we have a running node.</p>
+</div>
+<div class="section" id="sending-messages">
+<h2>Sending messages<a class="headerlink" href="#sending-messages" title="Permalink to this headline">¶</a></h2>
+<p>We start a new process by evaluating <code class="docutils literal"><span class="pre">runProcess</span></code>, which takes a node and
+a <code class="docutils literal"><span class="pre">Process</span></code> action to run, because our concurrent code will run in the
+<code class="docutils literal"><span class="pre">Process</span></code> monad. Each process has an identifier associated to it. The process
+id can be used to send messages to the running process - here we will send one
+to ourselves!</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>&#8211; in main</dt>
+<dd><dl class="first docutils">
+<dt>_ &lt;- runProcess node $ do</dt>
+<dd>&#8211; get our own process id
+self &lt;- getSelfPid
+send self &#8220;hello&#8221;
+hello &lt;- expect :: Process String
+liftIO $ putStrLn hello</dd>
+</dl>
+<p class="last">return ()</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Note that we haven&#8217;t deadlocked our own thread by sending to and receiving
+from its mailbox in this fashion. Sending messages is a completely
+asynchronous operation - even if the recipient doesn&#8217;t exist, no error will be
+raised and evaluating <code class="docutils literal"><span class="pre">send</span></code> will not block the caller, even if the caller is
+sending messages to itself.</p>
+<p>Each process also has a <em>mailbox</em> associated with it. Messages sent to
+a process are queued in this mailbox. A process can pop a message out of its
+mailbox using <code class="docutils literal"><span class="pre">expect</span></code> or the <code class="docutils literal"><span class="pre">receive*</span></code> family of functions. If no message of
+the expected type is in the mailbox currently, the process will block until
+there is. Messages in the mailbox are ordered by time of arrival.</p>
+<p>Let&#8217;s spawn two processes on the same node and have them talk to each other:</p>
+<blockquote>
+<div><p>import Control.Concurrent (threadDelay)
+import Control.Monad (forever)
+import Control.Distributed.Process
+import Control.Distributed.Process.Node
+import Network.Transport.TCP (createTransport, defaultTCPParameters)</p>
+<p>replyBack :: (ProcessId, String) -&gt; Process ()
+replyBack (sender, msg) = send sender msg</p>
+<p>logMessage :: String -&gt; Process ()
+logMessage msg = say $ &#8220;handling &#8221; ++ msg</p>
+<p>main :: IO ()
+main = do</p>
+<blockquote>
+<div><p>Right t &lt;- createTransport &#8220;127.0.0.1&#8221; &#8220;10501&#8221; defaultTCPParameters
+node &lt;- newLocalNode t initRemoteTable
+runProcess node $ do</p>
+<blockquote>
+<div><p>&#8211; Spawn another worker on the local node
+echoPid &lt;- spawnLocal $ forever $ do</p>
+<blockquote>
+<div>&#8211; Test our matches in order against each message in the queue
+receiveWait [match logMessage, match replyBack]</div></blockquote>
+<p class="attribution">&mdash;The <cite>say</cite> function sends a message to a process registered as &#8220;logger&#8221;.
+&#8211; By default, this process simply loops through its mailbox and sends
+&#8211; any received log message strings it finds to stderr.</p>
+</div></blockquote>
+<blockquote>
+<div><p>say &#8220;send some messages!&#8221;
+send echoPid &#8220;hello&#8221;
+self &lt;- getSelfPid
+send echoPid (self, &#8220;hello&#8221;)</p>
+<p>&#8211; <cite>expectTimeout</cite> waits for a message or times out after &#8220;delay&#8221;
+m &lt;- expectTimeout 1000000
+case m of</p>
+<blockquote>
+<div>&#8211; Die immediately - throws a ProcessExitException with the given reason.
+Nothing  -&gt; die &#8220;nothing came back!&#8221;
+Just s -&gt; say $ &#8220;got &#8221; ++ s ++ &#8221; back!&#8221;</div></blockquote>
+<p class="attribution">&mdash;Without the following delay, the process sometimes exits before the messages are exchanged.
+liftIO $ threadDelay 2000000</p>
+</div></blockquote>
+</div></blockquote>
+</div></blockquote>
+<p>Note that we&#8217;ve used <code class="docutils literal"><span class="pre">receiveWait</span></code> this time around to get a message.
+<code class="docutils literal"><span class="pre">receiveWait</span></code> and similarly named functions can be used with the
+[<code class="docutils literal"><span class="pre">Match</span></code> data type][5] to provide a range of advanced message
+processing capabilities. The <code class="docutils literal"><span class="pre">match</span></code> primitive allows you to construct
+a &#8220;potential message handler&#8221; and have it evaluated against received
+(or incoming) messages. Think of a list of <code class="docutils literal"><span class="pre">Match``es</span> <span class="pre">as</span> <span class="pre">the</span>
+<span class="pre">distributed</span> <span class="pre">equivalent</span> <span class="pre">of</span> <span class="pre">a</span> <span class="pre">pattern</span> <span class="pre">match.</span> <span class="pre">As</span> <span class="pre">with</span> <span class="pre">``expect</span></code>, if the
+mailbox does not contain a message that can be matched, the evaluating
+process will be blocked until a message arrives which _can_ be
+matched.</p>
+<p>In the _echo <a href="#id1"><span class="problematic" id="id2">server_</span></a> above, our first match prints out whatever string it
+receives. If the first message in our mailbox is not a <code class="docutils literal"><span class="pre">String</span></code>, then our
+second match is evaluated. Thus, given a tuple <code class="docutils literal"><span class="pre">t</span> <span class="pre">::</span> <span class="pre">(ProcessId,</span> <span class="pre">String)</span></code>, it
+will send the <code class="docutils literal"><span class="pre">String</span></code> component back to the sender&#8217;s <code class="docutils literal"><span class="pre">ProcessId</span></code>. If neither
+match succeeds, the echo server blocks until another message arrives and tries
+again.</p>
+</div>
+<div class="section" id="serializable-data">
+<h2>Serializable Data<a class="headerlink" href="#serializable-data" title="Permalink to this headline">¶</a></h2>
+<p>Processes may send any datum whose type implements the <code class="docutils literal"><span class="pre">Serializable</span></code>
+typeclass, defined as:</p>
+<blockquote>
+<div>class (Binary a, Typeable) =&gt; Serializable a
+instance (Binary a, Typeable a) =&gt; Serializable a</div></blockquote>
+<p>That is, any type that is <code class="docutils literal"><span class="pre">Binary</span></code> and <code class="docutils literal"><span class="pre">Typeable</span></code> is <code class="docutils literal"><span class="pre">Serializable</span></code>. This is
+the case for most of Cloud Haskell&#8217;s primitive types as well as many standard
+data types. For custom data types, the <code class="docutils literal"><span class="pre">Typeable</span></code> instance is always
+given by the compiler, and the <code class="docutils literal"><span class="pre">Binary</span></code> instance can be auto-generated
+too in most cases, e.g.:</p>
+<blockquote>
+<div><p>{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveGeneric #-}</p>
+<p>data T = T Int Char deriving (Generic, Typeable)</p>
+<p>instance Binary T</p>
+</div></blockquote>
+</div>
+<div class="section" id="spawning-remote-processes">
+<h2>Spawning Remote Processes<a class="headerlink" href="#spawning-remote-processes" title="Permalink to this headline">¶</a></h2>
+<p>We saw above that the behaviour of processes is determined by an action in the
+<code class="docutils literal"><span class="pre">Process</span></code> monad. However, actions in the <code class="docutils literal"><span class="pre">Process</span></code> monad, no more serializable
+than actions in the <code class="docutils literal"><span class="pre">IO</span></code> monad. If we can&#8217;t serialize actions, then how can we
+spawn processes on remote nodes?</p>
+<p>The solution is to consider only <em>static</em> actions and compositions thereof.
+A static action is always defined using a closed expression (intuitively, an
+expression that could in principle be evaluated at compile-time since it does
+not depend on any runtime arguments). The type of static actions in Cloud
+Haskell is <cite>Closure (Process a)</cite>. More generally, a value of type <cite>Closure b</cite>
+is a value that was constructed explicitly as the composition of symbolic
+pointers and serializable values. Values of type <cite>Closure b</cite> are serializable,
+even if values of type <cite>b</cite> might not be. For instance, while we can&#8217;t in general
+send actions of type <cite>Process ()</cite>, we can construct a value of type <cite>Closure
+(Process ())</cite> instead, containing a symbolic name for the action, and send
+that instead. So long as the remote end understands the same meaning for the
+symbolic name, this works just as well. A remote spawn then, takes a static
+action and sends that across the wire to the remote node.</p>
+<p>Static actions are not easy to construct by hand, but fortunately Cloud
+Haskell provides a little bit of Template Haskell to help. If <cite>f :: T1 -&gt; T2</cite>
+then</p>
+<blockquote>
+<div>$(mkClosure &#8216;f) :: T1 -&gt; Closure T2</div></blockquote>
+<p>You can turn any top-level unary function into a <cite>Closure</cite> using <cite>mkClosure</cite>.
+For curried functions, you&#8217;ll need to uncurry them first (i.e. &#8220;tuple up&#8221; the
+arguments). However, to ensure that the remote side can adequately interpret
+the resulting <cite>Closure</cite>, you&#8217;ll need to add a mapping in a so-called <em>remote
+table</em> associating the symbolic name of a function to its value. Processes can
+only be successfully spawned on remote nodes if all these remote nodes have
+the same remote table as the local one.</p>
+<p>We need to configure our remote table (see the [API reference][6] for
+more details) and the easiest way to do this, is to let the library
+generate the relevant code for us. For example:</p>
+<p>{% highlight haskell %}
+sampleTask :: (TimeInterval, String) -&gt; Process ()
+sampleTask (t, s) = sleep t &gt;&gt; say s</p>
+<p>remotable [&#8216;sampleTask]
+{% endhighlight %}</p>
+<p>The last line is a top-level Template Haskell splice. At the call site for
+<cite>spawn</cite>, we can construct a <cite>Closure</cite> corresponding to an application of
+<cite>sampleTask</cite> like so:</p>
+<blockquote>
+<div>($(mkClosure &#8216;sampleTask) (seconds 2, &#8220;foobar&#8221;))</div></blockquote>
+<p>The call to <cite>remotable</cite> implicitly generates a remote table by inserting
+a top-level definition <cite>__remoteTable :: RemoteTable -&gt; RemoteTable</cite> in our
+module for us. We compose this with other remote tables in order to come up
+with a final, merged remote table for all modules in our program:</p>
+<blockquote>
+<div><p>{-# LANGUAGE TemplateHaskell #-}</p>
+<p>import Control.Concurrent (threadDelay)
+import Control.Monad (forever)
+import Control.Distributed.Process
+import Control.Distributed.Process.Closure
+import Control.Distributed.Process.Node
+import Network.Transport.TCP (createTransport, defaultTCPParameters)</p>
+<p>sampleTask :: (Int, String) -&gt; Process ()
+sampleTask (t, s) = liftIO (threadDelay (t * 1000000)) &gt;&gt; say s</p>
+<p>remotable [&#8216;sampleTask]</p>
+<p>myRemoteTable :: RemoteTable
+myRemoteTable = Main.__remoteTable initRemoteTable</p>
+<p>main :: IO ()
+main = do</p>
+<blockquote>
+<div><p>Right transport &lt;- createTransport &#8220;127.0.0.1&#8221; &#8220;10501&#8221; defaultTCPParameters
+node &lt;- newLocalNode transport myRemoteTable
+runProcess node $ do</p>
+<blockquote>
+<div>us &lt;- getSelfNode
+_ &lt;- spawnLocal $ sampleTask (1 :: Int, &#8220;using spawnLocal&#8221;)
+pid &lt;- spawn us $ $(mkClosure &#8216;sampleTask) (1 :: Int, &#8220;using spawn&#8221;)
+liftIO $ threadDelay 2000000</div></blockquote>
+</div></blockquote>
+</div></blockquote>
+<p>In the above example, we spawn <cite>sampleTask</cite> on node <cite>us</cite> in two
+different ways:</p>
+<ul class="simple">
+<li>using <cite>spawn</cite>, which expects some node identifier to spawn a process
+on along with a <cite>Closure</cite> for the action of the process.</li>
+<li>using <cite>spawnLocal</cite>, a specialization of <cite>spawn</cite> for the case when the
+node identifier actually refers to the local node (i.e. <cite>us</cite>). In
+this special case, no serialization is necessary, so passing an
+action directly rather than a <cite>Closure</cite> works just fine.</li>
+</ul>
+<hr class="docutils" />
+<p>[1]: /static/doc/distributed-process/Control-Distributed-Process.html#v:Message
+[2]: <a class="reference external" href="http://hackage.haskell.org/package/distributed-process">http://hackage.haskell.org/package/distributed-process</a>
+[3]: /static/doc/distributed-process-platform/Control-Distributed-Process-Platform-Async.html
+[4]: /static/doc/distributed-process-platform/Control-Distributed-Process-Platform-ManagedProcess.htmlv:callAsync
+[5]: http://hackage.haskell.org/packages/archive/distributed-process/latest/doc/html/Control-Distributed-Process-Internal-Primitives.html#t:Match
+[6]: http://hackage.haskell.org/packages/archive/distributed-process/latest/doc/html/Control-Distributed-Process-Closure.html</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Getting Started</a><ul>
+<li><a class="reference internal" href="#setting-up-the-project">Setting up the project</a></li>
+<li><a class="reference internal" href="#creating-a-node">Creating a node</a></li>
+<li><a class="reference internal" href="#sending-messages">Sending messages</a></li>
+<li><a class="reference internal" href="#serializable-data">Serializable Data</a></li>
+<li><a class="reference internal" href="#spawning-remote-processes">Spawning Remote Processes</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to Haskell Distributed&#8217;s documentation!</a></li>
+      <li>Next: <a href="2ch.html" title="next chapter">&lt;no title&gt;</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/getting-started.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Haskell distributed team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="_sources/getting-started.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,366 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Programming with Network.Transport &mdash; Haskell Distributed 0.6 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Haskell Distributed 0.6 documentation" href="index.html" />
+    <link rel="prev" title="Advanced Managed Processes" href="6ch.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <p>&#8212;
+layout: tutorial2
+categories: tutorial
+title: Programming with Network.Transport
+&#8212;</p>
+<div class="section" id="programming-with-network-transport">
+<h1>Programming with Network.Transport<a class="headerlink" href="#programming-with-network-transport" title="Permalink to this headline">¶</a></h1>
+<p>### Introduction</p>
+<p>This is a tutorial introduction to <cite>Network.Transport</cite>. To follow along,
+you should probably already be familiar with <cite>Control.Concurrent</cite>; in
+particular, the use of <cite>fork</cite> and <a href="#id1"><span class="problematic" id="id2">`</span></a>MVar`s. The code for the tutorial can
+be downloaded as [tutorial-server.hs](/static/tutorial/tutorial-server.hs)
+and [tutorial-client.hs](/static/tutorial/tutorial-client.hs).</p>
+<hr class="docutils" />
+<p>### The Network Transport API</p>
+<p>Network.Transport is a network abstraction layer which offers the following concepts:</p>
+<ul class="simple">
+<li>Nodes in the network are represented by <a href="#id3"><span class="problematic" id="id4">`</span></a>EndPoint`s. These are heavyweight stateful objects.</li>
+<li>Each <cite>EndPoint</cite> has an <cite>EndPointAddress</cite>.</li>
+<li>Connections can be established from one <cite>EndPoint</cite> to another using the <cite>EndPointAddress</cite> of the remote end.</li>
+<li>The <cite>EndPointAddress</cite> can be serialised and sent over the network, where as <a href="#id5"><span class="problematic" id="id6">`</span></a>EndPoint`s and connections cannot.</li>
+<li>Connections between <a href="#id7"><span class="problematic" id="id8">`</span></a>EndPoint`s are unidirectional and lightweight.</li>
+<li>Outgoing messages are sent via a <cite>Connection</cite> object that represents the sending end of the connection.</li>
+<li>Incoming messages for <strong>all</strong> of the incoming connections on an <cite>EndPoint</cite> are collected via a shared receive queue.</li>
+<li>In addition to incoming messages, <a href="#id9"><span class="problematic" id="id10">`</span></a>EndPoint`s are notified of other <a href="#id11"><span class="problematic" id="id12">`</span></a>Event`s such as new connections or broken connections.</li>
+</ul>
+<p>In this tutorial we will create a simple &#8220;echo&#8221; server. Whenever a client
+opens a new connection to the server, the server in turns opens a connection
+back to the client. All messages that the client sends to the server will
+echoed by the server back to the client.</p>
+<p>Here is what it will look like. We can start the server on one host:</p>
+<p>{% highlight bash %}
+# ./tutorial-server 192.168.1.108 8080
+Echo server started at &#8220;192.168.1.108:8080:0&#8221;
+{% endhighlight %}</p>
+<p>then start the client on another. The client opens a connection to the server,
+sends &#8220;Hello world&#8221;, and prints all the <cite>Events</cite> it receives:</p>
+<p>{% highlight bash %}
+# ./tutorial-client 192.168.1.109 8080 192.168.1.108:8080:0
+ConnectionOpened 1024 ReliableOrdered &#8220;192.168.1.108:8080:0&#8221;
+Received 1024 [&#8220;Hello world&#8221;]
+ConnectionClosed 1024
+{% endhighlight %}</p>
+<p>The client receives three <a href="#id13"><span class="problematic" id="id14">`</span></a>Event`s:</p>
+<ol class="arabic simple">
+<li>The server (with address &#8220;192.168.1.108:8080:0&#8221;) opened a connection back to the client. The ID of this connection is 1024, and the connection is reliable and ordered (see below).</li>
+<li>Received a message on connection 1024: that is, on the connection the server just opened. This is the server echoing the message we sent.</li>
+<li>Connection 1024 was closed.</li>
+</ol>
+<p>Note that the server prints its address (&#8220;192.168.1.108:8080:0&#8221;) to the
+console when started and this must be passed explicitly as an argument to
+the client. Peer discovery and related issues are outside the scope of
+<cite>Network.Transport</cite>.</p>
+<p>### Writing the client</p>
+<p>We will start with the client
+([tutorial-client.hs](<a class="reference external" href="https://github.com/haskell-distributed/distributed-process/blob/master/doc/tutorial/tutorial-client.hs">https://github.com/haskell-distributed/distributed-process/blob/master/doc/tutorial/tutorial-client.hs</a>)),
+because it is simpler. We first need a bunch of imports:</p>
+<p>{% highlight haskell %}
+import Network.Transport
+import Network.Transport.TCP (createTransport)
+import System.Environment
+import Data.ByteString.Char8
+import Control.Monad
+{% endhighlight %}</p>
+<p>The client will consist of a single main function.</p>
+<p>{% highlight haskell %}
+main :: IO ()
+main = do
+{% endhighlight %}</p>
+<p>When we start the client we expect three command line arguments.
+Since the client will itself be a network endpoint, we need to know the IP
+address and port number to use for the client. Moreover, we need to know the
+endpoint address of the server (the server will print this address to the
+console when it is started):</p>
+<p>{% highlight haskell %}
+[host, port, serverAddr] &lt;- getArgs
+{% endhighlight %}</p>
+<p>Next we need to initialize the Network.Transport layer using <cite>createTransport</cite>
+from <cite>Network.Transport.TCP</cite> (in this tutorial we will use the TCP instance of
+<cite>Network.Transport</cite>). The type of <cite>createTransport</cite> is:</p>
+<p>{% highlight haskell %}
+createTransport :: N.HostName -&gt; N.ServiceName -&gt; IO (Either IOException Transport)
+{% endhighlight %}</p>
+<p>(where <cite>N</cite> is an alias for <cite>Network.Socket</cite>). For the sake of this tutorial we
+are going to ignore all error handling, so we are going to assume it will return
+a <cite>Right</cite> transport:</p>
+<p>{% highlight haskell %}
+Right transport &lt;- createTransport host port
+{% endhighlight %}</p>
+<p>Next we need to create an EndPoint for the client. Again, we are going
+to ignore errors:</p>
+<p>{% highlight haskell %}
+Right endpoint  &lt;- newEndPoint transport
+{% endhighlight %}</p>
+<p>Now that we have an endpoint we can connect to the server, after we convert
+the <cite>String</cite> we got from <cite>getArgs</cite> to an <cite>EndPointAddress</cite>:</p>
+<p>{% highlight haskell %}
+let addr = EndPointAddress (pack serverAddr)
+Right conn &lt;- connect endpoint addr ReliableOrdered defaultConnectHints
+{% endhighlight %}</p>
+<p><cite>ReliableOrdered</cite> means that the connection will be reliable (no messages will be
+lost) and ordered (messages will arrive in order). For the case of the TCP transport
+this makes no difference (_all_ connections are reliable and ordered), but this may
+not be true for other transports.</p>
+<p>Sending on our new connection is very easy:</p>
+<p>{% highlight haskell %}
+send conn [pack &#8220;Hello world&#8221;]
+{% endhighlight %}</p>
+<p>(<cite>send</cite> takes as argument an array of <a href="#id15"><span class="problematic" id="id16">`</span></a>ByteString`s).
+Finally, we can close the connection:</p>
+<p>{% highlight haskell %}
+close conn
+{% endhighlight %}</p>
+<p>Function <cite>receive</cite> can be used to get the next event from an endpoint. To print the
+first three events, we can do</p>
+<p>{% highlight haskell %}
+<a href="#id19"><span class="problematic" id="id20">replicateM_</span></a> 3 $ receive endpoint &gt;&gt;= print
+{% endhighlight %}</p>
+<p>Since we&#8217;re not expecting more than 3 events, we can now close the transport.</p>
+<p>{% highlight haskell %}
+closeTransport transport
+{% endhighlight %}</p>
+<p>That&#8217;s it! Here is the entire client again:</p>
+<p>{% highlight haskell %}
+main :: IO ()
+main = do</p>
+<blockquote>
+<div><p>[host, port, serverAddr] &lt;- getArgs
+Right transport &lt;- createTransport host port
+Right endpoint  &lt;- newEndPoint transport</p>
+<p>let addr = EndPointAddress (fromString serverAddr)
+Right conn &lt;- connect endpoint addr ReliableOrdered defaultConnectHints
+send conn [fromString &#8220;Hello world&#8221;]
+close conn</p>
+<p><a href="#id21"><span class="problematic" id="id22">replicateM_</span></a> 3 $ receive endpoint &gt;&gt;= print</p>
+<p>closeTransport transport</p>
+</div></blockquote>
+<p>{% endhighlight %}</p>
+<p>### Writing the server</p>
+<p>The server ([tutorial-server.hs](<a class="reference external" href="https://github.com/haskell-distributed/distributed-process/blob/master/doc/tutorial/tutorial-server.hs">https://github.com/haskell-distributed/distributed-process/blob/master/doc/tutorial/tutorial-server.hs</a>))
+is slightly more complicated, but only slightly. As with the client, we
+start with a bunch of imports:</p>
+<p>{% highlight haskell %}
+import Network.Transport
+import Network.Transport.TCP (createTransport)
+import Control.Concurrent
+import Data.Map
+import Control.Exception
+import System.Environment
+{% endhighlight %}</p>
+<p>We will write the main function first:</p>
+<p>{% highlight haskell %}
+main :: IO ()
+main = do</p>
+<blockquote>
+<div>[host, port]    &lt;- getArgs
+serverDone      &lt;- newEmptyMVar
+Right transport &lt;- createTransport host port
+Right endpoint  &lt;- newEndPoint transport
+forkIO $ echoServer endpoint serverDone
+putStrLn $ &#8220;Echo server started at &#8221; ++ show (address endpoint)
+readMVar serverDone <cite>onCtrlC</cite> closeTransport transport</div></blockquote>
+<p>{% endhighlight %}</p>
+<p>This is very similar to the <cite>main</cite> function for the client. We get the
+hostname and port number that the server should use and create a transport
+and an endpoint. Then we fork a thread to do the real work. We will write
+<cite>echoServer</cite> next; for now, suffices to note that <cite>echoServer</cite> will signal
+on the MVar <cite>serverDone</cite> when it completes, so that the main thread knows
+when to exit. Don&#8217;t worry about <cite>onCtrlC</cite> for now; it does what the
+name suggests.</p>
+<p>The goal of <cite>echoServer</cite> is simple: whenever somebody opens a connection to us,
+open a connection to them; whenever somebody sends us a message, echo that message;
+and whenever somebody closes their connection to us, we are going to close
+our connection to them.</p>
+<p><cite>Event</cite> is defined in <cite>Network.Transport</cite> as</p>
+<p>{% highlight haskell %}
+data Event =</p>
+<blockquote>
+<div><blockquote>
+<div>Received ConnectionId [ByteString]</div></blockquote>
+<div class="line-block">
+<div class="line">ConnectionClosed ConnectionId</div>
+<div class="line">ConnectionOpened ConnectionId Reliability EndPointAddress</div>
+<div class="line">EndPointClosed</div>
+</div>
+<p>...</p>
+</div></blockquote>
+<p>{% endhighlight %}</p>
+<p>(there are few other events, which we are going to ignore). <cite>ConnectionId`s help us
+distinguish messages sent on one connection from messages sent on another. In
+`echoServer</cite> we are going to maintain a mapping from those <a href="#id17"><span class="problematic" id="id18">`</span></a>ConnectionId`s to the
+connections that we will use to reply:</p>
+<ul class="simple">
+<li>Whenever somebody opens a connection, we open a connection in the other direction and add it to the map.</li>
+<li>Whenever we receive a message, we lookup the corresponding return connection and echo the message back.</li>
+<li>Whenever somebody closes the connection, we lookup and close the corresponding return connection.</li>
+</ul>
+<p>Finally, when we receive the <cite>EndPointClosed</cite> message we signal to the main
+thread that we are doing and terminate. We will receive this message when the
+main thread calls <cite>closeTransport</cite> (that is, when the user presses Control-C).</p>
+<p>{% highlight haskell %}
+echoServer :: EndPoint -&gt; MVar () -&gt; IO ()
+echoServer endpoint serverDone = go empty</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>where</dt>
+<dd><p class="first">go :: Map ConnectionId (MVar Connection) -&gt; IO ()
+go cs = do</p>
+<blockquote class="last">
+<div><p>event &lt;- receive endpoint
+case event of</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>ConnectionOpened cid rel addr -&gt; do</dt>
+<dd><p class="first">connMVar &lt;- newEmptyMVar
+forkIO $ do</p>
+<blockquote>
+<div>Right conn &lt;- connect endpoint addr rel defaultConnectHints
+putMVar connMVar conn</div></blockquote>
+<p class="last">go (insert cid connMVar cs)</p>
+</dd>
+<dt>Received cid payload -&gt; do</dt>
+<dd><dl class="first docutils">
+<dt>forkIO $ do</dt>
+<dd>conn &lt;- readMVar (cs ! cid)
+send conn payload
+return ()</dd>
+</dl>
+<p class="last">go cs</p>
+</dd>
+<dt>ConnectionClosed cid -&gt; do</dt>
+<dd><dl class="first docutils">
+<dt>forkIO $ do</dt>
+<dd>conn &lt;- readMVar (cs ! cid)
+close conn</dd>
+</dl>
+<p class="last">go (delete cid cs)</p>
+</dd>
+<dt>EndPointClosed -&gt; do</dt>
+<dd>putStrLn &#8220;Echo server exiting&#8221;
+putMVar serverDone ()</dd>
+</dl>
+</div></blockquote>
+</div></blockquote>
+</dd>
+</dl>
+</div></blockquote>
+<p>{% endhighlight %}</p>
+<p>This implements almost exactly what we described above. The only complication is that we want to avoid blocking the receive queue; so for every message that comes in we spawn a new thread to deal with it. Since is therefore possible that we receive the <cite>Received</cite> event before an outgoing connection has been established, we map connection IDs to MVars containing connections.</p>
+<p>Finally, we need to define <cite>onCtrlC</cite>; <cite>p onCtrlC q</cite> will run <cite>p</cite>; if this is interrupted by Control-C we run <cite>q</cite> and then try again:</p>
+<p>{% highlight haskell %}
+onCtrlC :: IO a -&gt; IO () -&gt; IO a
+p <cite>onCtrlC</cite> q = catchJust isUserInterrupt p (const $ q &gt;&gt; p <cite>onCtrlC</cite> q)</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>where</dt>
+<dd>isUserInterrupt :: AsyncException -&gt; Maybe ()
+isUserInterrupt UserInterrupt = Just ()
+isUserInterrupt _             = Nothing</dd>
+</dl>
+</div></blockquote>
+<p>{% endhighlight %}</p>
+<p>### Conclusion</p>
+<p>In this tutorial, we have implemented a small echo client and server
+to illustrate how the <cite>Network.Transport</cite> abstraction layer can be used.</p>
+<p>&lt;!&#8211; would it be possible to have some a sentence or two of commentary here about N.T? &#8211;&gt;</p>
+<p>See the [<cite>Network.Transport</cite> wiki page](<a class="reference external" href="https://github.com/haskell-distributed/distributed-process/wiki/Network.Transport">https://github.com/haskell-distributed/distributed-process/wiki/Network.Transport</a>) for more details.</p>
+<p>&lt;!&#8211; are there links to other things people who read this tutorial would want to know about? &#8211;&gt;</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="6ch.html" title="previous chapter">Advanced Managed Processes</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/tutorial-NT2.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Haskell distributed team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="_sources/tutorial-NT2.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

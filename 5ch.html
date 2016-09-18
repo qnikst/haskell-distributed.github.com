@@ -1,0 +1,232 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>![Sup1: ][sup1] &mdash; Haskell Distributed 0.6 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Haskell Distributed 0.6 documentation" href="index.html" />
+    <link rel="next" title="&lt;no title&gt;" href="6ch.html" />
+    <link rel="prev" title="&lt;no title&gt;" href="4ch.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <p>&#8212;
+layout: tutorial
+categories: tutorial
+sections: [&#8216;Introduction&#8217;, &#8216;Quis custodiet ipsos custodes&#8217;, &#8216;Isolated Restarts&#8217;, &#8216;All or nothing restarts&#8217;]
+title: 5. Supervision Principles
+&#8212;</p>
+<p>### Introduction</p>
+<p>In previous tutorial, we&#8217;ve looked at utilities for linking processes together
+and monitoring their lifecycle as it changes. The ability to link and monitor are
+foundational tools for building _reliable_ systems and are the bedrock principles
+on which Cloud Haskell&#8217;s supervision capabilities are built.</p>
+<p>A <cite>Supervisor</cite> manages a set of _child <a href="#id1"><span class="problematic" id="id2">processes_</span></a> throughout their entire lifecycle,
+from birth (spawning) till death (exiting). Supervision is a key component in building
+fault tolerant systems, providing applications with a structured way to recover from
+isolated failures without the whole system crashing. Supervisors allow us to structure
+our applications as independently managed subsystems, each with its own dependencies
+(and inter-dependencies with other subsystems) and specify various policies determining
+the fashion in which these subsystems are to be started, stopped (i.e., terminated)
+and how they should behave at each level in case of failures.</p>
+<p>Supervisors also provide a convenient means to shut down a system (or subsystem) in a
+controlled fashion, since supervisors will always terminate their children before
+exiting themselves and do so based on the policies supplied when they were initially
+created.</p>
+<p>### Quis custodiet ipsos custodes</p>
+<p>Supervisors can be used to construct a tree of processes, where some children are
+workers (e.g., regular processes) and others are themselves supervisors. Each supervisor
+is responsible for monitoring its children and handling child failures by policy, as
+well as deliberately terminating children when instructed to do so (either explicitly
+per child, or when the supervisor is itself told to terminate).</p>
+<p>Each supervisor takes with a list of _child <a href="#id3"><span class="problematic" id="id4">specifications_</span></a>, which tell the supervisor
+how to interact with its children. Each specification provides the supervisor with the
+following information about the corresponding child process:</p>
+<ol class="arabic simple">
+<li><cite>ChildKey</cite>: used to identify the child specification and process (once it has started)</li>
+<li><cite>ChildType</cite>: indicates whether the child is a worker or another (nested) supervisor</li>
+<li><cite>RestartPolicy</cite>: tells the supervisor under what circumstances the child should be restarted</li>
+<li><cite>ChildTerminationPolicy</cite>: tells the supervisor how to terminate the child, should it need to</li>
+<li><cite>ChildStart</cite>: provides a means for the supervisor to start/spawn the child process</li>
+</ol>
+<p>The <cite>RestartPolicy</cite> determines the circumstances under which a child should be
+restarted when the supervisor detects that it has exited. A <cite>Permanent</cite> child will
+always be restarted, whilst a <cite>Temporary</cite> child is never restarted. <cite>Transient</cite> children
+are only restarted if the exit normally (i.e., the <cite>DiedReason</cite> the supervisor sees for
+the child is <cite>DiedNormal</cite> rather than <cite>DiedException</cite>). <cite>Intrinsic</cite> children behave
+exactly like <cite>Transient</cite> ones, except that if they terminate normally, the whole
+supervisor (i.e., all the other children) exits normally as well, as if someone had
+triggered the shutdown/terminate sequence for the supervisor&#8217;s process explicitly.</p>
+<p>When a supervisor is told directly to terminate a child process, it uses the
+<cite>ChildTerminationPolicy</cite> to determine whether the child should be terminated
+_gracefully_ or _brutally <a href="#id5"><span class="problematic" id="id6">killed_</span></a>. This _shutdown <a href="#id7"><span class="problematic" id="id8">protocol_</span></a> is used throughout
+[distributed-process-platform][dpp] and in order for a child process to be managed
+effectively by its supervisor, it is imperative that it understands the protocol.
+When a _graceful_ shutdown is required, the supervisor will send an exit signal to the
+child process, with the <cite>ExitReason</cite> set to <cite>ExitShutdown</cite>, whence the child process is
+expected to perform any required cleanup and then exit with the same <cite>ExitReason</cite>,
+indicating that the shutdown happened cleanly/gracefully. On the other hand, when
+the <cite>RestartPolicy</cite> is set to <cite>TerminateImmediately</cite>, the supervisor will not send
+an exit signal at all, calling the <cite>kill</cite> primitive instead of the <cite>exit</cite> primitive.
+This immediately kills the child process without giving it the opportunity to clean
+up its internal state at all. The gracefull shutdown mode, <cite>TerminateTimeout</cite>, must
+provide a timeout value. The supervisor attempts a _gracefull_ shutdown initially,
+however if the child does not exit within the given time window, the supervisor will
+automatically revert to a _brutal <a href="#id9"><span class="problematic" id="id10">kill_</span></a> using <cite>TerminateImmediately</cite>. If the
+timeout value is set to <cite>Infinity</cite>, the supervisor will wait indefintiely for the
+child to exit cleanly.</p>
+<p>When a supervisor detects a child exit, it will attempt a restart. Whilst explicitly
+terminating a child will <strong>only</strong> terminate the specified child process, unexpected
+child exits can trigger a _branch <a href="#id11"><span class="problematic" id="id12">restart_</span></a>, where other (sibling) child processes are
+restarted along with the child that failed. How the supervisor goes about this
+_branch <a href="#id13"><span class="problematic" id="id14">restart_</span></a> is governed by the <cite>RestartStrategy</cite> given when the supervisor is
+first started.</p>
+<p>&gt; a subset) of the supervisor&#8217;s remaining children will be triggered. The exceptions
+&gt; to this rule are <cite>Temporary</cite> children and <cite>Transient</cite> children that exit normally,
+&gt; therefore <strong>not</strong> triggering a restart. The basic rule of thumb is that, if a child
+&gt; should be restarted and the <cite>RestartStrategy</cite> is not <cite>RestartOne</cite>, then a _branch_
+&gt; containing some other children will be restarted as well.
+&#8212;&#8212;</p>
+<p>### Isolated Restarts</p>
+<p>The <cite>RestartOne</cite> strategy is very simple. When one child fails, only that individual
+child is restarted and its siblings are left running. Use <cite>RestartOne</cite> whenever the
+processes being supervised are completely independent of one another, or a child can
+be restarted and lose it&#8217;s state without adversely affecting its siblings.</p>
+<div class="section" id="sup1-sup1">
+<h1>![Sup1: ][sup1]<a class="headerlink" href="#sup1-sup1" title="Permalink to this headline">¶</a></h1>
+<p>### All or nothing restarts</p>
+<p>The <cite>RestartAll</cite> strategy is used when our children are all inter-dependent and it&#8217;s
+necessary to restart them all whenever one child crashes. This strategy triggers one of
+those _branch <a href="#id15"><span class="problematic" id="id16">restarts_</span></a> we mentioned earlier, which in this case means that <strong>all</strong> the
+supervisor&#8217;s children are restarted if any child fails.</p>
+<p>The order and manner in which the surviving children are restarted depends on the chosen
+<cite>RestartMode</cite> which parameterises the <cite>RestartStrategy</cite>. This comes in three flavours:</p>
+<ol class="arabic simple">
+<li><cite>RestartEach</cite>: stops then starts each child sequentially</li>
+<li><cite>RestartInOrder</cite>: stops all children first (in order), then restarts them sequentially</li>
+<li><cite>RestartRevOrder</cite>: stops all children in one order, then restarts them sequentially in the opposite</li>
+</ol>
+<p>Each <cite>RestartMode</cite> is further parameterised by its <cite>RestartOrder</cite>, which is either left
+to righ, or right to left. To illustrate, we will consider three alternative configurations
+here, starting with <cite>RestartEach</cite> and <cite>LeftToRight</cite>.</p>
+</div>
+<div class="section" id="sup2-sup2">
+<h1>![Sup2: ][sup2]<a class="headerlink" href="#sup2-sup2" title="Permalink to this headline">¶</a></h1>
+<p>There are times when we need to shut down all the children first, before restarting them.
+The <cite>RestartInOrder</cite> mode will do this, shutting the children down according to our chosen
+<cite>RestartOrder</cite> and then starting them up in the same way. Here&#8217;s an example demonstrating
+<cite>RestartInOrder</cite> using <cite>LeftToRight</cite>.</p>
+</div>
+<div class="section" id="sup3-sup3">
+<h1>![Sup3: ][sup3]<a class="headerlink" href="#sup3-sup3" title="Permalink to this headline">¶</a></h1>
+<p>If we&#8217;d chosen <cite>RightToLeft</cite>, the children would have been stopped from right to left (i.e.,
+starting with child-3, then child-2, etc) and then restarted in the same order.</p>
+<p>The astute reader might&#8217;ve noticed that so far, we&#8217;ve yet to demonstrate the behaviour that&#8217;s
+default in [Erlang/OTP&#8217;s Supervisor][erlsup], and it&#8217;s a default for good reason. It is not
+uncommon for children to depend on one another and therefore need to be started in the correct
+order. Since these children rely on their siblings to function, we must stop them in the opposite
+order, otherwise the dependent children might crash whilst we&#8217;re restarting other processes they
+rely on. It follows that, in this setup, we cannot subsequently (re)start the children in the
+same order we stopped them either.</p>
+<p>[dpp]: <a class="reference external" href="https://github.com/haskell-distributed/distributed-process-platform">https://github.com/haskell-distributed/distributed-process-platform</a>
+[sup1]: /img/one-for-one.png
+[sup2]: /img/one-for-all.png
+[sup3]: /img/one-for-all-left-to-right.png
+[alert]: /img/alert.png
+[info]: /img/info.png
+[erlsup]: <a class="reference external" href="http://www.erlang.org/doc/man/supervisor.html">http://www.erlang.org/doc/man/supervisor.html</a></p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">![Sup1: ][sup1]</a></li>
+<li><a class="reference internal" href="#sup2-sup2">![Sup2: ][sup2]</a></li>
+<li><a class="reference internal" href="#sup3-sup3">![Sup3: ][sup3]</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="4ch.html" title="previous chapter">&lt;no title&gt;</a></li>
+      <li>Next: <a href="6ch.html" title="next chapter">&lt;no title&gt;</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/5ch.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Haskell distributed team.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="_sources/5ch.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
