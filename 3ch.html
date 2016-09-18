@@ -30,9 +30,7 @@
   
 
   
-    <link rel="top" title="Cloud Haskell User Guide" href="index.html"/>
-        <link rel="next" title="4. Managed Process Tutorial" href="4ch.html"/>
-        <link rel="prev" title="2. Overview" href="2ch.html"/> 
+    <link rel="top" title="Cloud Haskell User Guide" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -81,10 +79,36 @@
           
             
             
-                <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="getting-started.html">1. Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="2ch.html">2. Overview</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="">3. Message Ordering</a></li>
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">1. Book</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#getting-started">1.1. Getting Started</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#setting-up-the-project">1.1.1. Setting up the project</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#creating-a-node">1.1.2. Creating a node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#sending-messages">1.1.3. Sending messages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#serializable-data">1.1.4. Serializable Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#spawning-remote-processes">1.1.5. Spawning Remote Processes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="managing-topologies.html">2. Managing Topologies</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="managing-topologies.html#overview">2.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="managing-topologies.html#a-simple-example">2.2. A Simple Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="managing-topologies.html#master-slave-configurations">2.3. Master Slave Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="managing-topologies.html#other-topologies-and-backends">2.4. Other Topologies and Backends</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="getting-to-know-processes.html">3. Getting to know Processes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting-to-know-processes.html#message-ordering">3.1. Message Ordering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-to-know-processes.html#selective-receive">3.2. Selective Receive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-to-know-processes.html#advanced-mailbox-processing">3.3. Advanced Mailbox Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-to-know-processes.html#typed-channels">3.4. Typed Channels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-to-know-processes.html#process-lifetime">3.5. Process Lifetime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-to-know-processes.html#monitoring-and-linking">3.6. Monitoring and Linking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-to-know-processes.html#getting-process-info">3.7. Getting Process Info</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-to-know-processes.html#monad-transformer-stacks">3.8. Monad Transformer Stacks</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="4ch.html">4. Managed Process Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="5ch.html">5. ![Sup1: ][sup1]</a></li>
 <li class="toctree-l1"><a class="reference internal" href="5ch.html#sup2-sup2">6. ![Sup2: ][sup2]</a></li>
@@ -142,7 +166,7 @@ sections: [&#8216;Message Ordering&#8217;, &#8216;Selective Receive&#8217;, &#82
 title: 3. Getting to know Processes
 &#8212;</p>
 <div class="section" id="message-ordering">
-<h1>3. Message Ordering<a class="headerlink" href="#message-ordering" title="Permalink to this headline">¶</a></h1>
+<h1>Message Ordering<a class="headerlink" href="#message-ordering" title="Permalink to this headline">¶</a></h1>
 <p>We have already met the <cite>send</cite> primitive, used to deliver messages from one
 process to another. Here&#8217;s a review of what we&#8217;ve learned about <cite>send</cite> thus far:</p>
 <ol class="arabic simple">
@@ -667,15 +691,6 @@ use these instances - at present count there are more than 150 [packages using i
            </div>
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="4ch.html" class="btn btn-neutral float-right" title="4. Managed Process Tutorial" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="2ch.html" class="btn btn-neutral" title="2. Overview" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>

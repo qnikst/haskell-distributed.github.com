@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>8. Advanced Managed Processes &mdash; Cloud Haskell User Guide</title>
+  <title>5. Advanced Managed Processes &mdash; Cloud Haskell User Guide</title>
   
 
   
@@ -31,8 +31,8 @@
 
   
     <link rel="top" title="Cloud Haskell User Guide" href="index.html"/>
-        <link rel="next" title="9. Programming with Network.Transport" href="tutorial-NT2.html"/>
-        <link rel="prev" title="5. ![Sup1: ][sup1]" href="5ch.html"/> 
+        <link rel="next" title="6. Programming with Network.Transport" href="tutorial-NT2.html"/>
+        <link rel="prev" title="2. ![Sup1: ][sup1]" href="5ch.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -81,16 +81,68 @@
           
             
             
-                <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="getting-started.html">1. Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="2ch.html">2. Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="3ch.html">3. Message Ordering</a></li>
-<li class="toctree-l1"><a class="reference internal" href="4ch.html">4. Managed Process Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="5ch.html">5. ![Sup1: ][sup1]</a></li>
-<li class="toctree-l1"><a class="reference internal" href="5ch.html#sup2-sup2">6. ![Sup2: ][sup2]</a></li>
-<li class="toctree-l1"><a class="reference internal" href="5ch.html#sup3-sup3">7. ![Sup3: ][sup3]</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="">8. Advanced Managed Processes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorial-NT2.html">9. Programming with Network.Transport</a></li>
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorial</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/getting-started.html">1. Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-started.html#setting-up-the-project">1.1. Setting up the project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-started.html#creating-a-node">1.2. Creating a node</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-started.html#sending-messages">1.3. Sending messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-started.html#serializable-data">1.4. Serializable Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-started.html#spawning-remote-processes">1.5. Spawning Remote Processes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/getting-to-know-processes.html">2. Getting to know Processes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-know-processes.html#concurrency-and-distribution">2.1. Concurrency and Distribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-know-processes.html#process-lifetime">2.2. Process Lifetime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-know-processes.html#monitoring-and-linking">2.3. Monitoring and Linking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-know-processes.html#getting-process-info">2.4. Getting Process Info</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-know-processes.html#monad-transformer-stacks">2.5. Monad Transformer Stacks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/getting-to-messages.html">3. Getting to messaging</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-messages.html#what-is-serializable">3.1. What is Serializable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-messages.html#message-ordering">3.2. Message Ordering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-messages.html#selective-receive">3.3. Selective Receive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-messages.html#advanced-mailbox-processing">3.4. Advanced Mailbox Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-messages.html#typed-channels">3.5. Typed Channels</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/debugging.html">4. Debuging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managing-topologies.html">5. Managing Topologies</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="managing-topologies.html#overview">5.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="managing-topologies.html#a-simple-example">5.2. A Simple Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="managing-topologies.html#master-slave-configurations">5.3. Master Slave Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="managing-topologies.html#other-topologies-and-backends">5.4. Other Topologies and Backends</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Details</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="architecture/network-transport.html">1. Network Transport Abstraction Layer</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Cookbook</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="managed-process.html">1. Distributed-process platform</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="managed-process.html#managed-process-tutorial">1.1. Managed Process Tutorial</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="managed-process.html#introduction">1.1.1. Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managed-process.html#managed-processes">1.1.2. Managed Processes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managed-process.html#a-basic-example">1.1.3. A Basic Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managed-process.html#building-a-task-queue">1.1.4. Building a Task Queue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managed-process.html#implementing-the-client">1.1.5. Implementing the client</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managed-process.html#implementing-the-server">1.1.6. Implementing the server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managed-process.html#making-use-of-async">1.1.7. Making use of Async</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="5ch.html">2. ![Sup1: ][sup1]</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5ch.html#sup2-sup2">3. ![Sup2: ][sup2]</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5ch.html#sup3-sup3">4. ![Sup3: ][sup3]</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">5. Advanced Managed Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial-NT2.html">6. Programming with Network.Transport</a></li>
 </ul>
 
             
@@ -121,7 +173,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li>8. Advanced Managed Processes</li>
+    <li>5. Advanced Managed Processes</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -142,7 +194,7 @@ categories: tutorial
 title: 6. Advanced Managed Processes
 &#8212;</p>
 <div class="section" id="advanced-managed-processes">
-<h1>8. Advanced Managed Processes<a class="headerlink" href="#advanced-managed-processes" title="Permalink to this headline">¶</a></h1>
+<h1>5. Advanced Managed Processes<a class="headerlink" href="#advanced-managed-processes" title="Permalink to this headline">¶</a></h1>
 <p>### Introduction</p>
 <p>In this tutorial, we will look at some advanced ways of programming Cloud Haskell
 using the managed process API.</p>
@@ -672,10 +724,10 @@ the client using the send ports supplied in the request data.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="tutorial-NT2.html" class="btn btn-neutral float-right" title="9. Programming with Network.Transport" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="tutorial-NT2.html" class="btn btn-neutral float-right" title="6. Programming with Network.Transport" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="5ch.html" class="btn btn-neutral" title="5. ![Sup1: ][sup1]" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="5ch.html" class="btn btn-neutral" title="2. ![Sup1: ][sup1]" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

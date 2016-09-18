@@ -1,0 +1,355 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>5. Managing Topologies &mdash; Cloud Haskell User Guide</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Cloud Haskell User Guide" href="index.html"/>
+        <link rel="next" title="1. Network Transport Abstraction Layer" href="architecture/network-transport.html"/>
+        <link rel="prev" title="4. Debuging" href="tutorial/debugging.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Cloud Haskell
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorial</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="tutorial/getting-started.html">1. Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-started.html#setting-up-the-project">1.1. Setting up the project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-started.html#creating-a-node">1.2. Creating a node</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-started.html#sending-messages">1.3. Sending messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-started.html#serializable-data">1.4. Serializable Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-started.html#spawning-remote-processes">1.5. Spawning Remote Processes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/getting-to-know-processes.html">2. Getting to know Processes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-know-processes.html#concurrency-and-distribution">2.1. Concurrency and Distribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-know-processes.html#process-lifetime">2.2. Process Lifetime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-know-processes.html#monitoring-and-linking">2.3. Monitoring and Linking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-know-processes.html#getting-process-info">2.4. Getting Process Info</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-know-processes.html#monad-transformer-stacks">2.5. Monad Transformer Stacks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/getting-to-messages.html">3. Getting to messaging</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-messages.html#what-is-serializable">3.1. What is Serializable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-messages.html#message-ordering">3.2. Message Ordering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-messages.html#selective-receive">3.3. Selective Receive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-messages.html#advanced-mailbox-processing">3.4. Advanced Mailbox Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial/getting-to-messages.html#typed-channels">3.5. Typed Channels</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial/debugging.html">4. Debuging</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">5. Managing Topologies</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">5.1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#a-simple-example">5.2. A Simple Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#master-slave-configurations">5.3. Master Slave Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#other-topologies-and-backends">5.4. Other Topologies and Backends</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Details</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="architecture/network-transport.html">1. Network Transport Abstraction Layer</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Cookbook</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="managed-process.html">1. Distributed-process platform</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="managed-process.html#managed-process-tutorial">1.1. Managed Process Tutorial</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="managed-process.html#introduction">1.1.1. Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managed-process.html#managed-processes">1.1.2. Managed Processes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managed-process.html#a-basic-example">1.1.3. A Basic Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managed-process.html#building-a-task-queue">1.1.4. Building a Task Queue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managed-process.html#implementing-the-client">1.1.5. Implementing the client</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managed-process.html#implementing-the-server">1.1.6. Implementing the server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="managed-process.html#making-use-of-async">1.1.7. Making use of Async</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="5ch.html">2. ![Sup1: ][sup1]</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5ch.html#sup2-sup2">3. ![Sup2: ][sup2]</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5ch.html#sup3-sup3">4. ![Sup3: ][sup3]</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6ch.html">5. Advanced Managed Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial-NT2.html">6. Programming with Network.Transport</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Cloud Haskell</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>5. Managing Topologies</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/managing-topologies.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="managing-topologies">
+<h1>5. Managing Topologies<a class="headerlink" href="#managing-topologies" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>5.1. Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>In Cloud Haskell, the system topology is determined by your choice of <em>Cloud Haskell Backend</em>.
+The basic topology that Cloud Haskell currently ships with is determined by the
+<code class="docutils literal"><a class="reference external" href="https://hackage.haskell.org/package/distributed-process-simplelocalnet"><span class="pre">simplelocalnet</span></a></code> backend, which provides for a fully connected grid of nodes with optional
+master-slave configuration. This backend allows nodes to discover one another using UDP multicast.
+It is a zero-configuration backend designed to get you going with Cloud Haskell quickly without
+imposing any particular structure on your application.</p>
+<p>Other backends might work in a completely different manner, offering different types of (and
+relationships between) nodes, or simply by handling discovery differently (e.g., pre-defined
+node names/addresses, or by using some form of registrar such as DNS-SD/Bonjour).</p>
+</div>
+<div class="section" id="a-simple-example">
+<h2>5.2. A Simple Example<a class="headerlink" href="#a-simple-example" title="Permalink to this headline">¶</a></h2>
+<p>Here is an example program built against the <code class="docutils literal"><a class="reference external" href="https://hackage.haskell.org/package/distributed-process-simplelocalnet"><span class="pre">simplelocalnet</span></a></code> backend, that periodically
+searches for a list of peer nodes, and sends a message to a registered (named) process on each.</p>
+<div class="highlight-haskell"><div class="highlight"><pre><span class="kr">import</span> <span class="nn">System.Environment</span> <span class="p">(</span><span class="nf">getArgs</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Control.Distributed.Process</span>
+<span class="kr">import</span> <span class="nn">Control.Distributed.Process.Node</span> <span class="p">(</span><span class="nf">initRemoteTable</span><span class="p">,</span> <span class="nf">runProcess</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Control.Distributed.Process.Backend.SimpleLocalnet</span>
+<span class="kr">import</span> <span class="nn">Control.Monad</span> <span class="p">(</span><span class="nf">forever</span><span class="p">,</span> <span class="nf">forM_</span><span class="p">)</span>
+
+<span class="nf">main</span> <span class="ow">=</span> <span class="kr">do</span>
+  <span class="p">[</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">]</span> <span class="ow">&lt;-</span> <span class="n">getArgs</span>
+
+  <span class="n">backend</span> <span class="ow">&lt;-</span> <span class="n">initializeBackend</span> <span class="n">host</span> <span class="n">port</span> <span class="n">initRemoteTable</span>
+  <span class="n">node</span>    <span class="ow">&lt;-</span> <span class="n">newLocalNode</span> <span class="n">backend</span>
+  <span class="n">peers</span>   <span class="ow">&lt;-</span> <span class="n">findPeers</span> <span class="n">backend</span> <span class="mi">1000000</span>
+  <span class="n">runProcess</span> <span class="n">node</span> <span class="o">$</span> <span class="n">forM_</span> <span class="n">peers</span> <span class="o">$</span> <span class="nf">\</span><span class="n">peer</span> <span class="ow">-&gt;</span> <span class="n">nsendRemote</span> <span class="n">peer</span> <span class="s">&quot;echo-server&quot;</span> <span class="s">&quot;hello!&quot;</span>
+</pre></div>
+</div>
+<p>Clearly the program isn&#8217;t very useful, but it illustrates the two key concepts that
+<code class="docutils literal"><a class="reference external" href="https://hackage.haskell.org/package/distributed-process-simplelocalnet"><span class="pre">simplelocalnet</span></a></code> relies on. Firstly, that we
+<code class="docutils literal"><a class="reference external" href="https://hackage.haskell.org/package/distributed-process-simplelocalnet-0.2.3.2/docs/Control-Distributed-Process-Backend-SimpleLocalnet.html#v:initializeBackend"><span class="pre">initializeBackend</span></a></code>
+in order to get connected to an underlying communications infrastructure and secondly,
+that we can
+evaluate <code class="docutils literal"><a class="reference external" href="https://hackage.haskell.org/package/distributed-process-simplelocalnet-0.2.3.2/docs/Control-Distributed-Process-Backend-SimpleLocalnet.html#v:findPeers"><span class="pre">findPeers</span></a></code>
+at any time to obtain the set of other nodes that have broadcast their presence.</p>
+</div>
+<div class="section" id="master-slave-configurations">
+<h2>5.3. Master Slave Configurations<a class="headerlink" href="#master-slave-configurations" title="Permalink to this headline">¶</a></h2>
+<p>Here we simply rehash the master/slave example from the <code class="docutils literal"><a class="reference external" href="https://hackage.haskell.org/package/distributed-process-simplelocalnet"><span class="pre">simplelocalnet</span></a></code> documentation.
+With the same imports as the example above, we add a no-op slave and a master that
+takes a list of its (known) slaves, which it prints out before terminating them all.</p>
+<div class="highlight-haskell"><div class="highlight"><pre><span class="nf">main</span> <span class="ow">::</span> <span class="kt">IO</span> <span class="nb">()</span>
+<span class="nf">main</span> <span class="ow">=</span> <span class="kr">do</span>
+  <span class="n">args</span> <span class="ow">&lt;-</span> <span class="n">getArgs</span>
+
+  <span class="kr">case</span> <span class="n">args</span> <span class="kr">of</span>
+    <span class="p">[</span><span class="s">&quot;master&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="kr">do</span>
+      <span class="n">backend</span> <span class="ow">&lt;-</span> <span class="n">initializeBackend</span> <span class="n">host</span> <span class="n">port</span> <span class="n">initRemoteTable</span>
+      <span class="n">startMaster</span> <span class="n">backend</span> <span class="p">(</span><span class="n">master</span> <span class="n">backend</span><span class="p">)</span>
+    <span class="p">[</span><span class="s">&quot;slave&quot;</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="kr">do</span>
+      <span class="n">backend</span> <span class="ow">&lt;-</span> <span class="n">initializeBackend</span> <span class="n">host</span> <span class="n">port</span> <span class="n">initRemoteTable</span>
+      <span class="n">startSlave</span> <span class="n">backend</span>
+</pre></div>
+</div>
+<p>And the master node is defined thus:</p>
+<div class="highlight-haskell"><div class="highlight"><pre><span class="nf">master</span> <span class="ow">::</span> <span class="kt">Backend</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="kt">NodeId</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="kt">Process</span> <span class="nb">()</span>
+<span class="nf">master</span> <span class="n">backend</span> <span class="n">slaves</span> <span class="ow">=</span> <span class="kr">do</span>
+  <span class="c1">-- Do something interesting with the slaves</span>
+  <span class="n">liftIO</span> <span class="o">.</span> <span class="n">putStrLn</span> <span class="o">$</span> <span class="s">&quot;Slaves: &quot;</span> <span class="o">++</span> <span class="n">show</span> <span class="n">slaves</span>
+  <span class="c1">-- Terminate the slaves when the master terminates (this is optional)</span>
+  <span class="n">terminateAllSlaves</span> <span class="n">backend</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="other-topologies-and-backends">
+<h2>5.4. Other Topologies and Backends<a class="headerlink" href="#other-topologies-and-backends" title="Permalink to this headline">¶</a></h2>
+<p>Many other topologies are in development, including
+<code class="docutils literal"><a class="reference external" href="https://hackage.haskell.org/package/distributed-process-azure"><span class="pre">distributed-process-azure</span></a></code> that runs on Windows Azure.
+Some third party backends have also been developed, such as the
+<code class="docutils literal"><a class="reference external" href="https://hackage.haskell.org/package/distributed-process-p2p"><span class="pre">distributed-process-p2p</span></a></code> backend, which given a known node
+address, discovers and maintains knowledge of it&#8217;s peers.</p>
+<p>Here is an example of node discovery
+using the <code class="docutils literal"><a class="reference external" href="https://hackage.haskell.org/package/distributed-process-p2p"><span class="pre">distributed-process-p2p</span></a></code> backend:</p>
+<div class="highlight-haskell"><div class="highlight"><pre><span class="kr">import</span> <span class="nn">System.Environment</span> <span class="p">(</span><span class="nf">getArgs</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Control.Distributed.Process</span>
+<span class="kr">import</span> <span class="nn">Control.Distributed.Process.Node</span> <span class="p">(</span><span class="nf">initRemoteTable</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Control.Distributed.Process.Backend.P2P</span>
+<span class="kr">import</span> <span class="nn">Control.Monad</span> <span class="p">(</span><span class="nf">forever</span><span class="p">,</span> <span class="nf">mapM_</span><span class="p">)</span>
+
+<span class="nf">main</span> <span class="ow">=</span> <span class="kr">do</span>
+  <span class="p">[</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">]</span> <span class="ow">&lt;-</span> <span class="n">getArgs</span>
+
+  <span class="n">backend</span> <span class="ow">&lt;-</span> <span class="n">initializeBackend</span> <span class="n">host</span> <span class="n">port</span> <span class="n">initRemoteTable</span>
+  <span class="n">node</span>    <span class="ow">&lt;-</span> <span class="n">newLocalNode</span> <span class="n">backend</span>
+  <span class="n">runProcess</span> <span class="n">node</span> <span class="o">$</span> <span class="n">forever</span> <span class="o">$</span> <span class="kr">do</span>
+    <span class="n">findPeers</span> <span class="o">&gt;&gt;=</span> <span class="n">mapM_</span> <span class="o">$</span> <span class="nf">\</span><span class="n">peer</span> <span class="ow">-&gt;</span> <span class="n">nsend</span> <span class="n">peer</span> <span class="s">&quot;echo-server&quot;</span> <span class="s">&quot;hello!&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="architecture/network-transport.html" class="btn btn-neutral float-right" title="1. Network Transport Abstraction Layer" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="tutorial/debugging.html" class="btn btn-neutral" title="4. Debuging" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Haskell distributed team.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.7',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
