@@ -409,13 +409,14 @@ def make_extlink_role(handle_link):
 def hackage_link(base, link):
     parts = link.rsplit('.', 1)
 
-    module_part = parts[0].replace('.', '-')
+    module_name = parts[0]
+    module_part = module_name.replace('.', '-')
 
     #TODO: urlescape
     full_url = base + '/'+ module_part + '.html'
 
     if len(parts) == 1 or len(parts[1]) == 0:
-        return module_part, full_url # A module link
+        return module_name, full_url # A module link
     else:
         ref = parts[1]
         #Types start from upper case letter in haskell
