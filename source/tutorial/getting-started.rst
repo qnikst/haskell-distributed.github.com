@@ -64,9 +64,10 @@ And now we have a running node.
 Sending messages
 ----------------
 
-We start a new process by evaluating :distributed-process:`runProcess <Control-Distributed-Process-Node.html#v:runProcess>`,
-which takes a node and a ``Process`` action to run, because our concurrent code
-will run in the ``Process`` monad. Each process has an identifier associated to it.
+We start a new process by evaluating :distributed-process:`Control.Distributed.Process.Node.runProcess`,
+which takes a node and a :distributed-process:`Control.Distributed.Process.Process` action to run,
+because our concurrent code will run in the :distributed-process:`Control.Distributed.Process.Process` monad.
+Each process has an identifier associated to it.
 The process id can be used to send messages to the running process - here we will send one
 to ourselves!
 
@@ -84,13 +85,14 @@ to ourselves!
 Note that we haven't deadlocked our own thread by sending to and receiving
 from its mailbox in this fashion. Sending messages is a completely
 asynchronous operation - even if the recipient doesn't exist, no error will be
-raised and evaluating ``send`` will not block the caller, even if the caller is
-sending messages to itself.
+raised and evaluating :distributed-process:`Control.Distributed.Process.send` will
+not block the caller, even if the caller is sending messages to itself.
 
 Each process also has a *mailbox* associated with it. Messages sent to
 a process are queued in this mailbox. A process can pop a message out of its
-mailbox using ``expect`` or the ``receive*`` family of functions. If no message of
-the expected type is in the mailbox currently, the process will block until
+mailbox using :distributed-process:`Control.Distributed.Process.expect` or
+the ``receive*`` family of functions. If no message of the expected type
+is in the mailbox currently, the process will block until
 there is. Messages in the mailbox are ordered by time of arrival.
 
 Let's spawn two processes on the same node and have them talk to each other:
@@ -138,15 +140,15 @@ Let's spawn two processes on the same node and have them talk to each other:
       -- Without the following delay, the process sometimes exits before the messages are exchanged.
       liftIO $ threadDelay 2000000
 
-Note that we've used ``receiveWait`` this time around to get a message.
-``receiveWait`` and similarly named functions can be used with the
-[``Match`` data type][5] to provide a range of advanced message
-processing capabilities. The ``match`` primitive allows you to construct
-a "potential message handler" and have it evaluated against received
+Note that we've used :distributed-process:`Control.Distributed.Process.receiveWait`
+this time around to get a message. ``receiveWait`` and similarly named functions can
+be used with the :distributed-process:`Control.Distributed.Process.Match` data type
+to provide a range of advanced message processing capabilities. The ``match`` primitive
+allows you to construct a "potential message handler" and have it evaluated against received
 (or incoming) messages. Think of a list of ``Match``\es as the
 distributed equivalent of a pattern match. As with ``expect``, if the
 mailbox does not contain a message that can be matched, the evaluating
-process will be blocked until a message arrives which _can_ be
+process will be blocked until a message arrives which *can* be
 matched.
 
 In the *echo server* above, our first match prints out whatever string it
@@ -177,9 +179,9 @@ too in most cases, e.g.:
 
   {-# LANGUAGE DeriveDataTypeable #-}
   {-# LANGUAGE DeriveGeneric #-}
-  
+
   data T = T Int Char deriving (Generic, Typeable)
-  
+
   instance Binary T
 
 

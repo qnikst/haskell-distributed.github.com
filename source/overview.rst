@@ -95,20 +95,22 @@ directional dependencies.
    digraph {
       app->dp->nt;
       app->chb->nti->hctl;
-      app{title="Application"};
-      dp{title="Cloud Haskell\n(distributed-process)"};
-      nt{title="Transport Interface\n(network-transport)"};
-      chb{title="Cloud Haskell Backend\n(distributed-process-*)"};
-      nti{title="Transport Implementation\n(network-transport-*)"};
-      hctl{title="Haskell/C Transport Library"};
+      app{label="Application"};
+      dp{label="Cloud Haskell\n(distributed-process)"};
+      nt{label="Transport Interface\n(network-transport)"};
+      chb{label="Cloud Haskell Backend\n(distributed-process-*)"};
+      nti{label="Transport Implementation\n(network-transport-*)"};
+      hctl{label="Haskell/C Transport Library"};
    }
 
 In this diagram, the various nodes roughly correspond to specific modules:
 
-    Cloud Haskell                : Control.Distributed.Process
-    Cloud Haskell                : Control.Distributed.Process.*
-    Transport Interface          : Network.Transport
-    Transport Implementation     : Network.Transport.*
+-----------------------      ------------------------------
+Cloud Haskell                Control.Distributed.Process
+Cloud Haskell                Control.Distributed.Process.*
+Transport Interface          Network.Transport
+Transport Implementation     Network.Transport.*
+
 
 An application is built using the primitives provided by the Cloud
 Haskell layer, provided by the `Control.Distributed.Process` module, which
