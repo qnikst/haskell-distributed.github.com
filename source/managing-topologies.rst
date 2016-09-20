@@ -4,9 +4,9 @@ Managing Topologies
 Overview
 --------
 
-In Cloud Haskell, the system topology is determined by your choice of _Cloud Haskell Backend_.
+In Cloud Haskell, the system topology is determined by your choice of *Cloud Haskell Backend*.
 The basic topology that Cloud Haskell currently ships with is determined by the
-[`simplelocalnet`][1] backend, which provides for a fully connected grid of nodes with optional
+|simplelocalnet| backend, which provides for a fully connected grid of nodes with optional
 master-slave configuration. This backend allows nodes to discover one another using UDP multicast.
 It is a zero-configuration backend designed to get you going with Cloud Haskell quickly without
 imposing any particular structure on your application.
@@ -18,7 +18,7 @@ node names/addresses, or by using some form of registrar such as DNS-SD/Bonjour)
 A Simple Example
 --------------------
 
-Here is an example program built against the [`simplelocalnet`][1] backend, that periodically
+Here is an example program built against the |simplelocalnet| backend, that periodically
 searches for a list of peer nodes, and sends a message to a registered (named) process on each.
 
 .. code-block:: haskell
@@ -38,15 +38,17 @@ searches for a list of peer nodes, and sends a message to a registered (named) p
     runProcess node $ forM_ peers $ \peer -> nsendRemote peer "echo-server" "hello!"
 
 Clearly the program isn't very useful, but it illustrates the two key concepts that
-``simplelocalnet`` relies on. Firstly, that we ``initializeBackend`` in order to get
-connected to an underlying communications infrastructure and secondly, that we can
-evaluate ``findPeers`` at any time to obtain the set of other nodes that have broadcast
-their presence.
+|simplelocalnet| relies on. Firstly, that we
+:dp-simple:`Control.Distributed.Process.Backend.SimpleLocalnet.initializeBackend`
+in order to get connected to an underlying communications infrastructure and secondly,
+that we can
+evaluate :dp-simple:`Control.Distributed.Process.Backend.SimpleLocalnet.findPeers`
+at any time to obtain the set of other nodes that have broadcast their presence.
 
 Master Slave Configurations
 ---------------------------
 
-Here we simply rehash the master/slave example from the `simplelocalnet` documentation.
+Here we simply rehash the master/slave example from the |simplelocalnet| documentation.
 With the same imports as the example above, we add a no-op slave and a master that
 takes a list of its (known) slaves, which it prints out before terminating them all.
 
@@ -78,13 +80,14 @@ And the master node is defined thus:
 Other Topologies and Backends
 -----------------------------
 
-Many other topologies are in development, including one that runs on Windows Azure,
-which is available [here][2]. Some third party backends have also been developed,
-such as the [`distributed-process-p2p`][3] backend, which given a known node address,
-discovers and maintains knowledge of it's peers.
+Many other topologies are in development, including
+:hackage-pkg:`distributed-process-azure` that runs on Windows Azure.
+Some third party backends have also been developed, such as the
+:hackage-pkg:`distributed-process-p2p` backend, which given a known node
+address, discovers and maintains knowledge of it's peers.
 
-Here is an example of node discovery using the [`distributed-process-p2p`][3]
-backend:
+Here is an example of node discovery
+using the :hackage-pkg:`distributed-process-p2p` backend:
 
 .. code-block:: haskell
 
@@ -93,16 +96,14 @@ backend:
   import Control.Distributed.Process.Node (initRemoteTable)
   import Control.Distributed.Process.Backend.P2P
   import Control.Monad (forever, mapM_)
-  
+
   main = do
     [host, port] <- getArgs
-    
+
     backend <- initializeBackend host port initRemoteTable
     node    <- newLocalNode backend
     runProcess node $ forever $ do
       findPeers >>= mapM_ $ \peer -> nsend peer "echo-server" "hello!"
 
-[1]: http://hackage.haskell.org/package/distributed-process-simplelocalnet
-[2]: http://hackage.haskell.org/package/distributed-process-azure
-[3]: https://bitbucket.org/dpwiz/distributed-process-p2p
+.. |simplelocalnet| replace:: :hackage-pkg:`simplelocalnet <distributed-process-simplelocalnet>`
 
