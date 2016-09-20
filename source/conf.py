@@ -383,7 +383,8 @@ hackage_packages = [
     #(package name, version, role name)
     ('distributed-process', '0.6.1', ''),
     ('distributed-process-async', '0.2.3', 'd-p-async'),
-    ('network-transport', 'latest', 'n-t')
+    ('network-transport', 'latest', 'n-t'),
+    ('distributed-process-simplelocalnet', '0.2.3.2', 'd-p-simple')
 ]
 
 
