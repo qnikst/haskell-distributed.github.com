@@ -369,6 +369,72 @@ intersphinx_mapping = {'https://docs.python.org/': None}
 # extlinks -- see http://www.sphinx-doc.org/en/stable/ext/extlinks.html
 extlinks = {
         'hackage-pkg': ('http://hackage.haskell.org/package/%s', ''),
-        'distributed-process': ('https://hackage.haskell.org/package/distributed-process-0.6.1/docs/%s', ''),
+        #'distributed-process': ('https://hackage.haskell.org/package/distributed-process-0.6.1/docs/%s', ''),
         'api-dp': ('https://hackage.haskell.org/package/distributed-process-0.6.1/docs/Control-Distributed-Process.html?v:%s', ''),
 }
+
+
+# usage :distributed-process:`Control.Distributed.Process.Node.runProcess`
+# or :d-p-async:`...`
+# or :distributed-process:`this function <Control.Distributed.Process.Node.runProcess>`
+
+hackage_url = "https://hackage.haskell.org/package"
+
+#add stuff here
+hackage_packages = [
+    #(package name, version, role name)
+    ('distributed-process', '0.6.1', ''),
+    ('distributed-process-async', '0.2.3', 'd-p-async')
+]
+
+
+from sphinx.util.nodes import split_explicit_title
+from docutils import nodes, utils
+
+def make_extlink_role(handle_link):
+    def role(typ, rawtext, text, lineno, inliner, options={}, content=[]):
+        text = utils.unescape(text)
+        has_explicit_title, parsed_title, target = split_explicit_title(text)
+
+        title, full_url = handle_link(target)
+        if has_explicit_title:
+            title = parsed_title
+        pnode = nodes.reference(title, title, internal=False, refuri=full_url)
+        literal = nodes.literal(rawtext)
+        literal += pnode
+        return [literal], []
+    return role
+
+
+def hackage_link(base, link):
+    parts = link.rsplit('.', 1)
+
+    module_part = parts[0].replace('.', '-')
+
+    #TODO: urlescape
+    full_url = base + '/'+ module_part + '.html'
+
+    if len(parts) == 1 or len(parts[1]) == 0:
+        return module_part, full_url # A module link
+    else:
+        ref = parts[1]
+        #Types start from upper case letter in haskell
+        if ref[0].isupper():
+            full_url += '#t:' + ref
+        else:
+            full_url += '#v:' + ref
+        return ref, full_url
+
+def add_hackage_roles(app):
+    for pkg, version, rolename in hackage_packages:
+        if rolename == '':
+            rolename = pkg
+        base_url = hackage_url+'/'+pkg+'-'+version+'/docs'
+        handler = lambda part: hackage_link(base_url, part)
+        role = make_extlink_role(handler)
+        app.add_role(rolename, role)
+
+
+def setup(app):
+    add_hackage_roles(app)
+
