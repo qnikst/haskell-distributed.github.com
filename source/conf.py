@@ -369,7 +369,6 @@ intersphinx_mapping = {'https://docs.python.org/': None}
 # extlinks -- see http://www.sphinx-doc.org/en/stable/ext/extlinks.html
 extlinks = {
         'hackage-pkg': ('http://hackage.haskell.org/package/%s', ''),
-        #'distributed-process': ('https://hackage.haskell.org/package/distributed-process-0.6.1/docs/%s', ''),
         'api-dp': ('https://hackage.haskell.org/package/distributed-process-0.6.1/docs/Control-Distributed-Process.html?v:%s', ''),
 }
 
@@ -384,7 +383,8 @@ hackage_url = "https://hackage.haskell.org/package"
 hackage_packages = [
     #(package name, version, role name)
     ('distributed-process', '0.6.1', ''),
-    ('distributed-process-async', '0.2.3', 'd-p-async')
+    ('distributed-process-async', '0.2.3', 'd-p-async'),
+    ('network-transport', 'latest', 'n-t')
 ]
 
 

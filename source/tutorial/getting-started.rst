@@ -19,14 +19,14 @@ Setting up the project
 
 Starting a new Cloud Haskell project using ``stack`` is as easy as
 
-.. code-block:: bash
+.. code-block:: console
 
-   $ stack new
+  $ stack new
 
 in a fresh new directory. This will populate the directory with
 a number of files, chiefly ``stack.yaml`` and ``*.cabal`` metadata files
-for the project. You'll want to add ``distributed-process`` and
-``network-transport-tcp`` to the ``build-depends`` stanza of the
+for the project. You'll want to add :hackage-pkg:`distributed-process` and
+:hackage-pkg:`network-transport-tcp` to the ``build-depends`` stanza of the
 executable section.
 
 Creating a node
@@ -64,12 +64,11 @@ And now we have a running node.
 Sending messages
 ----------------
 
-We start a new process by evaluating :distributed-process:`Control.Distributed.Process.Node.runProcess`,
-which takes a node and a :distributed-process:`Control.Distributed.Process.Process` action to run,
-because our concurrent code will run in the :distributed-process:`Control.Distributed.Process.Process` monad.
-Each process has an identifier associated to it.
-The process id can be used to send messages to the running process - here we will send one
-to ourselves!
+We start a new process by evaluating |runProcess|, which takes a node and a
+|Process| action to run, because our concurrent code will run in the |Process|
+monad. Each process has an identifier associated to it. The process id can be
+used to send messages to the running process - here we will send one to
+ourselves!
 
 .. code-block:: haskell
 
@@ -85,7 +84,7 @@ to ourselves!
 Note that we haven't deadlocked our own thread by sending to and receiving
 from its mailbox in this fashion. Sending messages is a completely
 asynchronous operation - even if the recipient doesn't exist, no error will be
-raised and evaluating :distributed-process:`Control.Distributed.Process.send` will
+raised and evaluating |send| will
 not block the caller, even if the caller is sending messages to itself.
 
 Each process also has a *mailbox* associated with it. Messages sent to
@@ -141,9 +140,10 @@ Let's spawn two processes on the same node and have them talk to each other:
       liftIO $ threadDelay 2000000
 
 Note that we've used :distributed-process:`Control.Distributed.Process.receiveWait`
-this time around to get a message. ``receiveWait`` and similarly named functions can
+this time around to get a message. :distributed-process:`Control.Distributed.Process.receiveWait` and similarly named functions can
 be used with the :distributed-process:`Control.Distributed.Process.Match` data type
-to provide a range of advanced message processing capabilities. The ``match`` primitive
+to provide a range of advanced message processing capabilities. The
+:distributed-process:`Control.Distributed.Process.match` primitive
 allows you to construct a "potential message handler" and have it evaluated against received
 (or incoming) messages. Think of a list of ``Match``\es as the
 distributed equivalent of a pattern match. As with ``expect``, if the
@@ -285,3 +285,7 @@ different ways:
   node identifier actually refers to the local node (i.e. ``us``). In
   this special case, no serialization is necessary, so passing an
   action directly rather than a ``Closure`` works just fine.
+
+.. |Process| replace:: :distributed-process:`Control.Distributed.Process.Process`
+.. |runProcess| replace:: :distributed-process:`Control.Distributed.Process.Node.runProcess`
+.. |send| replace:: :distributed-process:`Control.Distributed.Process.send` 

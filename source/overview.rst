@@ -95,25 +95,25 @@ directional dependencies.
    digraph {
       app->dp->nt;
       app->chb->nti->hctl;
-      app{label="Application"};
-      dp{label="Cloud Haskell\n(distributed-process)"};
-      nt{label="Transport Interface\n(network-transport)"};
-      chb{label="Cloud Haskell Backend\n(distributed-process-*)"};
-      nti{label="Transport Implementation\n(network-transport-*)"};
-      hctl{label="Haskell/C Transport Library"};
+      app[label="Application"];
+      dp[label="Cloud Haskell\n(distributed-process)"];
+      nt[label="Transport Interface\n(network-transport)"];
+      chb[label="Cloud Haskell Backend\n(distributed-process-*)"];
+      nti[label="Transport Implementation\n(network-transport-*)"];
+      hctl[label="Haskell/C Transport Library"];
    }
 
 In this diagram, the various nodes roughly correspond to specific modules:
 
------------------------      ------------------------------
+========================     ==============================
 Cloud Haskell                Control.Distributed.Process
 Cloud Haskell                Control.Distributed.Process.*
 Transport Interface          Network.Transport
 Transport Implementation     Network.Transport.*
-
+========================     ==============================
 
 An application is built using the primitives provided by the Cloud
-Haskell layer, provided by the `Control.Distributed.Process` module, which
+Haskell layer, provided by the :distributed-process:`Control.Distributed.Process.` module, which
 defines abstractions such as nodes and processes.
 
 The application also depends on a Cloud Haskell Backend, which
@@ -121,12 +121,12 @@ provides functions to allow the initialisation of the transport layer
 using whatever topology might be appropriate to the application.
 
 It is, of course, possible to create new Cloud Haskell nodes by
-using a Network Transport Backend such as `Network.Transport.TCP`
+using a Network Transport Backend such as :n-t:`Network.Transport.TCP.`
 directly.
 
 The Cloud Haskell interface and backend make use of the Transport
-interface provided by the `Network.Transport` module.
-This also serves as an interface for the `Network.Transport.*`
+interface provided by the :n-t:`Network.Transport.` module.
+This also serves as an interface for the ``Network.Transport.*``
 module, which provides a specific implementation for this transport,
 and may, for example, be based on some external library written in
 Haskell or C.
