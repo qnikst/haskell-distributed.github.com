@@ -368,7 +368,6 @@ intersphinx_mapping = {'https://docs.python.org/': None}
 
 # extlinks -- see http://www.sphinx-doc.org/en/stable/ext/extlinks.html
 extlinks = {
-        'hackage-pkg': ('http://hackage.haskell.org/package/%s', ''),
         'api-dp': ('https://hackage.haskell.org/package/distributed-process-0.6.1/docs/Control-Distributed-Process.html?v:%s', ''),
 }
 
@@ -435,7 +434,11 @@ def add_hackage_roles(app):
         role = make_extlink_role(handler)
         app.add_role(rolename, role)
 
+def hackage_package_link(target):
+    full_url = hackage_url+'/'+target
+    return target, full_url
 
 def setup(app):
     add_hackage_roles(app)
+    app.add_role('hackage-pkg', make_extlink_role(hackage_package_link))
 
