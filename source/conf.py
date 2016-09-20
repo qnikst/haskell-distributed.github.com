@@ -368,7 +368,6 @@ intersphinx_mapping = {'https://docs.python.org/': None}
 
 # extlinks -- see http://www.sphinx-doc.org/en/stable/ext/extlinks.html
 extlinks = {
-        'api-dp': ('https://hackage.haskell.org/package/distributed-process-0.6.1/docs/Control-Distributed-Process.html?v:%s', ''),
 }
 
 
@@ -382,9 +381,10 @@ hackage_url = "https://hackage.haskell.org/package"
 hackage_packages = [
     #(package name, version, role name)
     ('distributed-process', '0.6.1', ''),
-    ('distributed-process-async', '0.2.3', 'd-p-async'),
+    ('distributed-process-async', '0.2.3', 'dp-async'),
     ('network-transport', 'latest', 'n-t'),
-    ('distributed-process-simplelocalnet', '0.2.3.2', 'd-p-simple')
+    ('distributed-process-simplelocalnet', '0.2.3.2', 'dp-simple'),
+    ('distributed-process-client-server', '0.1.3.2', 'dp-cs')
 ]
 
 
@@ -418,13 +418,7 @@ def hackage_link(base, link):
     if len(parts) == 1 or len(parts[1]) == 0:
         return module_name, full_url # A module link
     else:
-        ref = parts[1]
-        #Types start from upper case letter in haskell
-        if ref[0].isupper():
-            full_url += '#t:' + ref
-        else:
-            full_url += '#v:' + ref
-        return ref, full_url
+        return module_link(full_url, parts[1])
 
 def add_hackage_roles(app):
     for pkg, version, rolename in hackage_packages:
@@ -439,7 +433,19 @@ def hackage_package_link(target):
     full_url = hackage_url+'/'+target
     return target, full_url
 
+def module_link(base, target):
+    full_url = base
+    if target[0].isupper():
+        full_url += '#t:' + target
+    else:
+        full_url += '#v:' + target
+    return target, full_url
+
+api_dp_base = "https://hackage.haskell.org/package/distributed-process-0.6.1/docs/Control-Distributed-Process.html"
+
+
 def setup(app):
     add_hackage_roles(app)
     app.add_role('hackage-pkg', make_extlink_role(hackage_package_link))
+    app.add_role('api-dp', make_extlink_role(lambda *args: module_link(api_dp_base, *args)))
 

@@ -4,7 +4,7 @@ Managing Topologies
 Overview
 --------
 
-In Cloud Haskell, the system topology is determined by your choice of _Cloud Haskell Backend_.
+In Cloud Haskell, the system topology is determined by your choice of *Cloud Haskell Backend*.
 The basic topology that Cloud Haskell currently ships with is determined by the
 |simplelocalnet| backend, which provides for a fully connected grid of nodes with optional
 master-slave configuration. This backend allows nodes to discover one another using UDP multicast.
@@ -39,10 +39,10 @@ searches for a list of peer nodes, and sends a message to a registered (named) p
 
 Clearly the program isn't very useful, but it illustrates the two key concepts that
 |simplelocalnet| relies on. Firstly, that we
-:d-p-simple:`Control.Distributed.Process.Backend.SimpleLocalnet.initializeBackend`
+:dp-simple:`Control.Distributed.Process.Backend.SimpleLocalnet.initializeBackend`
 in order to get connected to an underlying communications infrastructure and secondly,
 that we can
-evaluate :d-p-simple:`Control.Distributed.Process.Backend.SimpleLocalnet.findPeers`
+evaluate :dp-simple:`Control.Distributed.Process.Backend.SimpleLocalnet.findPeers`
 at any time to obtain the set of other nodes that have broadcast their presence.
 
 Master Slave Configurations
