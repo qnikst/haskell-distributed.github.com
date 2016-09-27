@@ -382,8 +382,9 @@ hackage_url = "https://hackage.haskell.org/package"
 #add stuff here
 hackage_packages = [
     #(package name, version, role name)
-    ('distributed-process', '0.6.1', ''),
+    ('distributed-process', '0.6.1', 'dp'),
     ('distributed-process-async', '0.2.3', 'dp-async'),
+    ('distributed-process-extras', '0.2.1.2', 'dp-extras'),
     ('network-transport', 'latest', 'n-t'),
     ('distributed-process-simplelocalnet', '0.2.3.2', 'dp-simple'),
     ('distributed-process-client-server', '0.1.3.2', 'dp-cs')
@@ -398,12 +399,13 @@ def make_extlink_role(handle_link):
         text = utils.unescape(text)
         has_explicit_title, parsed_title, target = split_explicit_title(text)
 
-        title, full_url = handle_link(target)
+        title, full_url, classes = handle_link(target)
         if has_explicit_title:
             title = parsed_title
         pnode = nodes.reference(title, title, internal=False, refuri=full_url)
         literal = nodes.literal(rawtext)
         literal += pnode
+        pnode['classes'].extend(classes)
         return [literal], []
     return role
 
@@ -418,9 +420,24 @@ def hackage_link(base, link):
     full_url = base + '/'+ module_part + '.html'
 
     if len(parts) == 1 or len(parts[1]) == 0:
-        return module_name, full_url # A module link
+        return module_name, full_url, [] # A module link
     else:
         return module_link(full_url, parts[1])
+
+def hackage_package_link(target):
+    full_url = hackage_url+'/'+target
+    return target, full_url, []
+
+def module_link(base, target):
+    full_url = base
+    if target[0].isupper():
+        full_url += '#t:' + target
+        classes = ['kt']
+    else:
+        full_url += '#v:' + target
+        classes = ['nf']
+    return target, full_url, classes
+
 
 def add_hackage_roles(app):
     for pkg, version, rolename in hackage_packages:
@@ -430,18 +447,6 @@ def add_hackage_roles(app):
         app.add_role(pkg, role)
         if rolename != '':
             app.add_role(rolename, role)
-
-def hackage_package_link(target):
-    full_url = hackage_url+'/'+target
-    return target, full_url
-
-def module_link(base, target):
-    full_url = base
-    if target[0].isupper():
-        full_url += '#t:' + target
-    else:
-        full_url += '#v:' + target
-    return target, full_url
 
 api_dp_base = "https://hackage.haskell.org/package/distributed-process-0.6.1/docs/Control-Distributed-Process.html"
 
