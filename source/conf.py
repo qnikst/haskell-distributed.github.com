@@ -422,12 +422,12 @@ def hackage_link(base, link):
 
 def add_hackage_roles(app):
     for pkg, version, rolename in hackage_packages:
-        if rolename == '':
-            rolename = pkg
         base_url = hackage_url+'/'+pkg+'-'+version+'/docs'
         handler = lambda part, base_url=base_url: hackage_link(base_url, part)
         role = make_extlink_role(handler)
-        app.add_role(rolename, role)
+        app.add_role(pkg, role)
+        if rolename != '':
+            app.add_role(rolename, role)
 
 def hackage_package_link(target):
     full_url = hackage_url+'/'+target
