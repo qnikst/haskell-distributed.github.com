@@ -381,13 +381,19 @@ hackage_url = "https://hackage.haskell.org/package"
 
 #add stuff here
 hackage_packages = [
-    #(package name, version, role name)
-    ('distributed-process', '0.6.1', 'dp'),
-    ('distributed-process-async', '0.2.3', 'dp-async'),
-    ('distributed-process-extras', '0.2.1.2', 'dp-extras'),
-    ('network-transport', 'latest', 'n-t'),
-    ('distributed-process-simplelocalnet', '0.2.3.2', 'dp-simple'),
-    ('distributed-process-client-server', '0.1.3.2', 'dp-cs')
+    #(package name, version, default module, role name)
+    ('distributed-process', '0.6.1',
+     'Control.Distributed.Process', 'dp'),
+    ('distributed-process-async', '0.2.3',
+     'Control.Distributed.Process.Async', 'dp-async'),
+    ('distributed-process-extras', '0.2.1.2',
+     'Control.Distributed.Process.Extras', 'dp-extras'),
+    ('network-transport', 'latest', 'Network.Transport', 'n-t'),
+    ('distributed-process-simplelocalnet', '0.2.3.2',
+     'Control.Distributed.Process.Backend.SimpleLocalnet', 'dp-simple'),
+    ('distributed-process-client-server', '0.1.3.2',
+     'Control.Distributed.Process.ManagedProcess', 'dp-cs'),
+    ('base', '4.9.0.0', 'Prelude', '')
 ]
 
 
@@ -410,19 +416,24 @@ def make_extlink_role(handle_link):
     return role
 
 
-def hackage_link(base, link):
+def hackage_link(base, def_module, link):
     parts = link.rsplit('.', 1)
 
-    module_name = parts[0]
+    if len(parts) == 1:
+        module_name = def_module
+        target = parts[0]
+    else:
+        module_name, target = parts
+
     module_part = module_name.replace('.', '-')
 
     #TODO: urlescape
     full_url = base + '/'+ module_part + '.html'
 
-    if len(parts) == 1 or len(parts[1]) == 0:
+    if len(target) == 0:
         return module_name, full_url, [] # A module link
     else:
-        return module_link(full_url, parts[1])
+        return module_link(full_url, target)
 
 def hackage_package_link(target):
     full_url = hackage_url+'/'+target
@@ -440,9 +451,10 @@ def module_link(base, target):
 
 
 def add_hackage_roles(app):
-    for pkg, version, rolename in hackage_packages:
+    for pkg, version, def_module, rolename in hackage_packages:
         base_url = hackage_url+'/'+pkg+'-'+version+'/docs'
-        handler = lambda part, base_url=base_url: hackage_link(base_url, part)
+        handler = lambda part, base_url=base_url, def_module=def_module: \
+                  hackage_link(base_url, def_module, part)
         role = make_extlink_role(handler)
         app.add_role(pkg, role)
         if rolename != '':
