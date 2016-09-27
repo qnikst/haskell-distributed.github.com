@@ -215,7 +215,7 @@ incompatibility. This leaves us with the definition found in distributed-process
 
 Beyond simple relays and proxies, the raw message handling capabilities available in
 distributed-process can be utilised to develop highly generic message processing code.
-All the richness of the distributed-process-platform APIs (such as :ref:`managed-process`) which
+All the richness of the distributed-process-platform APIs (such as :doc:`/managed-process`) which
 will be discussed in later tutorials are, in fact, built upon these families of primitives.
 
 Typed Channels
