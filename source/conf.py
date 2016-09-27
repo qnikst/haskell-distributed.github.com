@@ -441,12 +441,14 @@ def hackage_package_link(target):
 
 def module_link(base, target):
     full_url = base
-    if target[0].isupper():
-        full_url += '#t:' + target
-        classes = ['kt']
+    parts = target.split(':')
+    if len(parts) == 1:
+        kind = 't' if target[0].isupper() else 'v'
     else:
-        full_url += '#v:' + target
-        classes = ['nf']
+        kind, target = parts
+
+    classes = ['kt'] if target[0].isupper() else ['nf']
+    full_url += '#' + kind + ':' + target
     return target, full_url, classes
 
 
