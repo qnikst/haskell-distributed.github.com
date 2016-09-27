@@ -300,9 +300,9 @@ closed. Typically we manage this with the |bracket| function.
 In the base library, |bracket| is defined in :base:`Control.Exception.` with
 this signature::
 
-  bracket :: IO a        --^ computation to run first ("acquire resource")
-          -> (a -> IO b) --^ computation to run last ("release resource")
-          -> (a -> IO c) --^ computation to run in-between
+  bracket :: IO a        -- ^ computation to run first ("acquire resource")
+          -> (a -> IO b) -- ^ computation to run last ("release resource")
+          -> (a -> IO c) -- ^ computation to run in-between
           -> IO c
 
 Great! We pass an IO action that acquires a resource; |bracket| passes that
@@ -366,9 +366,9 @@ lifted versions of many functions in the Haskell base library. For example,
 ``Control.Exception.Lifted`` has a definition of bracket that looks like this::
 
   bracket :: MonadBaseControl IO m
-          => m a         --^ computation to run first ("acquire resource")
-          -> (a -> m b)  --^ computation to run last ("release resource")
-          -> (a -> m c)  --^ computation to run in-between
+          => m a         -- ^ computation to run first ("acquire resource")
+          -> (a -> m b)  -- ^ computation to run last ("release resource")
+          -> (a -> m c)  -- ^ computation to run in-between
           -> m c
 
 It is just the same as the version found in base, except it is generalized to work
