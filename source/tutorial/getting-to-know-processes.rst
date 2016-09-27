@@ -186,7 +186,7 @@ Whilst the built-in `link` primitive terminates the link-ee regardless of exit r
 :hackage-pkg:`distributed-process-extras` provides an alternate function
 :dp-extras:`Control.Distributed.Process.Extras.linkOnFailure`,
 which only dispatches the `ProcessLinkException` if the link-ed process dies abnormally
-(i.e., with some `DiedReason` other than `DiedNormal`).
+(i.e., with some `DiedReason` other than `v:DiedNormal`).
 
 
 .. TODO:: describe monitors better and move ``linkOnFailure`` to the cookbook.
@@ -231,7 +231,7 @@ the predicate passed to `matchIf` is used to determine whether the notification 
 receiving is for the process that called us, or the *linked to* process. If the former
 dies, we've nothing more to do, since links are unidirectional. If the latter dies
 however, we must examine the `DiedReason` the `ProcessMonitorNotification` provides us
-with, to determine whether the subject exited normally (i.e., with `DiedNormal`).
+with, to determine whether the subject exited normally (i.e., with `v:DiedNormal`).
 If the exit was *abnormal*, we throw a `ProcessLinkException` to the original caller,
 which is exactly how an ordinary link would behave.
 
