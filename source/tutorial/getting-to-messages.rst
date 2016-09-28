@@ -279,4 +279,5 @@ and :api-dp:`receiveTimeout`.
 .. |Message| replace:: :distributed-process:`Control.Distributed.Process.Message`
 .. |handleMessage| replace:: :distributed-process:`Control.Distributed.Process.handleMessage`
 .. |unwrapMessage| replace:: :distributed-process:`Control.Distributed.Process.unwrapMessage`
-.. |Serializable| replace:: :distributed-process:`Control.Distributed.Process.Serialzieable.Serializable`
+.. |Serializable| replace:: :distributed-process:`Control.Distributed.Process.Serializable.Serializable`
+
