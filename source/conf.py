@@ -393,7 +393,8 @@ hackage_packages = [
      'Control.Distributed.Process.Backend.SimpleLocalnet', 'dp-simple'),
     ('distributed-process-client-server', '0.1.3.2',
      'Control.Distributed.Process.ManagedProcess', 'dp-cs'),
-    ('base', '4.9.0.0', 'Prelude', '')
+    ('base', '4.9.0.0', 'Prelude', ''),
+    ('lifted-base', '0.2.3.8', '', '')
 ]
 
 
