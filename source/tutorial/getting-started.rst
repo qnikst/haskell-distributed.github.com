@@ -1,3 +1,5 @@
+.. default-role:: distributed-process
+
 Getting Started
 ===============
 
@@ -32,7 +34,7 @@ executable section.
 Creating a node
 ---------------
 
-Cloud Haskell's ``lightweight processes`` reside on a "node", which must
+Cloud Haskell's *lightweight processes* reside on a *"node"*, which must
 be initialised with a network transport implementation and a remote table.
 The latter is required so that physically separate nodes can identify known
 objects in the system (such as types and functions) when receiving messages
@@ -65,7 +67,7 @@ Sending messages
 ----------------
 
 We start a new process by evaluating |runProcess|, which takes a node and a
-|Process| action to run, because our concurrent code will run in the |Process|
+`Process` action to run, because our concurrent code will run in the `Process`
 monad. Each process has an identifier associated to it. The process id can be
 used to send messages to the running process - here we will send one to
 ourselves!
@@ -84,14 +86,13 @@ ourselves!
 Note that we haven't deadlocked our own thread by sending to and receiving
 from its mailbox in this fashion. Sending messages is a completely
 asynchronous operation - even if the recipient doesn't exist, no error will be
-raised and evaluating |send| will
-not block the caller, even if the caller is sending messages to itself.
+raised and evaluating `send` will not block the caller, even if the caller is
+sending messages to itself.
 
 Each process also has a *mailbox* associated with it. Messages sent to
 a process are queued in this mailbox. A process can pop a message out of its
-mailbox using :distributed-process:`Control.Distributed.Process.expect` or
-the ``receive*`` family of functions. If no message of the expected type
-is in the mailbox currently, the process will block until
+mailbox using `expect` or the `receive` family of functions. If no message of
+the expected type is in the mailbox currently, the process will block until
 there is. Messages in the mailbox are ordered by time of arrival.
 
 Let's spawn two processes on the same node and have them talk to each other:
@@ -139,29 +140,26 @@ Let's spawn two processes on the same node and have them talk to each other:
       -- Without the following delay, the process sometimes exits before the messages are exchanged.
       liftIO $ threadDelay 2000000
 
-Note that we've used :distributed-process:`Control.Distributed.Process.receiveWait`
-this time around to get a message. :distributed-process:`Control.Distributed.Process.receiveWait` and similarly named functions can
-be used with the :distributed-process:`Control.Distributed.Process.Match` data type
-to provide a range of advanced message processing capabilities. The
-:distributed-process:`Control.Distributed.Process.match` primitive
-allows you to construct a "potential message handler" and have it evaluated against received
-(or incoming) messages. Think of a list of ``Match``\es as the
-distributed equivalent of a pattern match. As with ``expect``, if the
+Note that we've used `receiveWait` this time around to get a message.
+`receiveWait` and similarly named functions can be used with the `Match` data
+type to provide a range of advanced message processing capabilities. The `match`
+primitive allows you to construct a "potential message handler" and have it
+evaluated against received (or incoming) messages. Think of a list of `Match`\es
+as the distributed equivalent of a pattern match. As with `expect`, if the
 mailbox does not contain a message that can be matched, the evaluating
-process will be blocked until a message arrives which *can* be
-matched.
+process will be blocked until a message arrives which *can* be matched.
 
 In the *echo server* above, our first match prints out whatever string it
 receives. If the first message in our mailbox is not a ``String``, then our
 second match is evaluated. Thus, given a tuple ``t :: (ProcessId, String)``, it
-will send the ``String`` component back to the sender's ``ProcessId``. If neither
+will send the ``String`` component back to the sender's `ProcessId`. If neither
 match succeeds, the echo server blocks until another message arrives and tries
 again.
 
 Serializable Data
 -----------------
 
-Processes may send any datum whose type implements the ``Serializable``
+Processes may send any datum whose type implements the |Serializable|
 typeclass, defined as:
 
 .. code-block:: haskell
@@ -169,7 +167,7 @@ typeclass, defined as:
    class (Binary a, Typeable) => Serializable a
    instance (Binary a, Typeable a) => Serializable a
 
-That is, any type that is ``Binary`` and ``Typeable`` is ``Serializable``. This is
+That is, any type that is ``Binary`` and ``Typeable`` is |Serializable|. This is
 the case for most of Cloud Haskell's primitive types as well as many standard
 data types. For custom data types, the ``Typeable`` instance is always
 given by the compiler, and the ``Binary`` instance can be auto-generated
@@ -189,7 +187,7 @@ Spawning Remote Processes
 -------------------------
 
 We saw above that the behaviour of processes is determined by an action in the
-``Process`` monad. However, actions in the ``Process`` monad, no more serializable
+`Process` monad. However, actions in the `Process` monad, no more serializable
 than actions in the ``IO`` monad. If we can't serialize actions, then how can we
 spawn processes on remote nodes?
 
@@ -215,10 +213,10 @@ then
 
    $(mkClosure 'f) :: T1 -> Closure T2
 
-You can turn any top-level unary function into a ``Closure`` using ``mkClosure``.
+You can turn any top-level unary function into a `Closure` using |mkClosure|.
 For curried functions, you'll need to uncurry them first (i.e. "tuple up" the
 arguments). However, to ensure that the remote side can adequately interpret
-the resulting ``Closure``, you'll need to add a mapping in a so-called *remote
+the resulting `Closure`, you'll need to add a mapping in a so-called *remote
 table* associating the symbolic name of a function to its value. Processes can
 only be successfully spawned on remote nodes if all these remote nodes have
 the same remote table as the local one.
@@ -235,14 +233,14 @@ generate the relevant code for us. For example:
    remotable ['sampleTask]
 
 The last line is a top-level Template Haskell splice. At the call site for
-``spawn``, we can construct a ``Closure`` corresponding to an application of
+`spawn`, we can construct a `Closure` corresponding to an application of
 ``sampleTask`` like so:
 
 .. code-block::hakell
 
      ($(mkClosure 'sampleTask) (seconds 2, "foobar"))
 
-The call to ``remotable`` implicitly generates a remote table by inserting
+The call to |remotable| implicitly generates a remote table by inserting
 a top-level definition ``__remoteTable :: RemoteTable -> RemoteTable`` in our
 module for us. We compose this with other remote tables in order to come up
 with a final, merged remote table for all modules in our program:
@@ -276,16 +274,17 @@ with a final, merged remote table for all modules in our program:
        pid <- spawn us $ $(mkClosure 'sampleTask) (1 :: Int, "using spawn")
        liftIO $ threadDelay 2000000
 
-In the above example, we spawn ``sampleTask`` on node ``us`` in two
-different ways:
+In the above example, we spawn ``sampleTask`` on node ``us`` in two different
+ways:
 
-* using ``spawn``, which expects some node identifier to spawn a process
-  on along with a ``Closure`` for the action of the process.
-* using ``spawnLocal``, a specialization of ``spawn`` for the case when the
+* using `spawn`, which expects some node identifier to spawn a process
+  on along with a `Closure` for the action of the process.
+* using `spawnLocal`, a specialization of `spawn` for the case when the
   node identifier actually refers to the local node (i.e. ``us``). In
   this special case, no serialization is necessary, so passing an
-  action directly rather than a ``Closure`` works just fine.
+  action directly rather than a `Closure` works just fine.
 
-.. |Process| replace:: :distributed-process:`Control.Distributed.Process.Process`
 .. |runProcess| replace:: :distributed-process:`Control.Distributed.Process.Node.runProcess`
-.. |send| replace:: :distributed-process:`Control.Distributed.Process.send` 
+.. |mkClosure| replace:: :distributed-process:`Control.Distributed.Process.Closure.mkClosure` 
+.. |remotable| replace:: :distributed-process:`Control.Distributed.Process.Closure.remotable` 
+.. |Serializable| replace:: :distributed-process:`Control.Distributed.Process.Serializable.Serializable`
