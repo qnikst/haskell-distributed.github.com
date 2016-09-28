@@ -13,9 +13,9 @@ deals explicitly with
 
 
 The core of Cloud Haskell's concurrency and distribution support resides in the
-[distributed-process][distributed-process] library. As well as the APIs necessary for starting
-nodes and forking processes on them, we find all the basic primitives required
-to
+:hackage-pkg:`distributed-process` library. As well as the APIs necessary for
+starting nodes and forking processes on them, we find all the basic primitives
+required to
 
 * spawn processes locally and remotely
 * send and receive messages, optionally using typed channels
@@ -27,7 +27,7 @@ process layer.
 
 
 A concurrent process is somewhat like a Haskell thread - in fact it is a
-``forkIO`` thread - but with few differences.
+|forkIO| thread - but with few differences.
 
   1. Process run `Process` code instead of ``IO``. This allow process to use
      communication function specific to the distributed-process.
@@ -147,7 +147,7 @@ via asynchronous exceptions - that is the case in the current implementation - b
 these are implemented in such a fashion that if you send a message and **then** an
 exit signal, the message is guaranteed to arrive first.
 
-Because processes are implemented with ``forkIO`` we might be tempted to stop
+Because processes are implemented with |forkIO| we might be tempted to stop
 them by throwing an asynchronous exception to the process, but this is almost
 certainly the wrong thing to do. Firstly, processes might reside on a remote
 node, in which case throwing an exception is impossible. Secondly, if we send
@@ -363,7 +363,8 @@ explanation written by Michael Snoyman which is available [here][mctrlt].
 
 :hackage-pkg:`lifted-base` takes advantage of these typeclasses to provide
 lifted versions of many functions in the Haskell base library. For example,
-``Control.Exception.Lifted`` has a definition of bracket that looks like this::
+:lifted-base:`Control.Exception.Lifted.bracket` has a definition of bracket that
+looks like this::
 
   bracket :: MonadBaseControl IO m
           => m a         -- ^ computation to run first ("acquire resource")
@@ -407,9 +408,12 @@ hackage which use these instances - at present count there are more than 150
 
 .. warning::
 
-   This instance can enable use of functions such as ``forkIO`` (or, ``fork``
-   from :hackage-pkg:`lifted-base`) which compromise invariants in the `Process`
-   monad and can lead to confusing and subtle issues. Always use the
-   *Cloud Haskell* functions such as `spawnLocal` instead.
+   This instance can enable use of functions such as |forkIO| (or, 
+   :lifted-base:`Control.Concurrent.Lifted.fork` from :hackage-pkg:`lifted-base`)
+   which compromise invariants in the `Process` monad and can lead to confusing
+   and subtle issues. Always use the *Cloud Haskell* functions such as
+   `spawnLocal` instead.
 
 .. |bracket| replace:: :base:`Control.Exception.bracket`
+.. |forkIO| replace:: :base:`Control.Concurrent.forkIO`
+,. |fork| replace:: :lifted-base:`Control.Concurrent.Lifted.fork`
